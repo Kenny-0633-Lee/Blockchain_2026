@@ -1,0 +1,21 @@
+# Mac/Windows 시스템 파일
+.DS_Store
+Thumbs.db
+
+# Python
+.venv/
+__pycache__/
+
+# Node.js
+node_modules/
+
+# Solidity Build
+artifacts/
+build/
+cache/
+
+# *** KEY FILES (절대 업로드 금지) ***
+.env
+secrets.json
+mnemonic.txt
+private_key.pem
