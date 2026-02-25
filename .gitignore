@@ -19,3 +19,7 @@ cache/
 secrets.json
 mnemonic.txt
 private_key.pem
+00_Admin_Only/
+.env
+__pycache__/
+.DS_Store
