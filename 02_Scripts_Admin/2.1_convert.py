@@ -4,49 +4,48 @@ from pathlib import Path
 
 def convert_csv_to_json(input_file: str, output_file: str):
     """
-    수강생 지갑 주소 데이터를 자동 배포용 JSON 형식으로 변환합니다.
-    관리자용 스크립트이므로 한글 주석을 사용합니다.
+    Tally에서 수집된 한글 헤더 CSV를 관리용 JSON으로 변환합니다.
     """
-    # 경로 설정: 스크립트는 02_Scripts_Admin에 있고, 데이터는 00_Admin_Only에 있음
     base_path = Path(__file__).parent.parent / "00_Admin_Only"
     csv_path = base_path / input_file
     json_path = base_path / output_file
 
     if not csv_path.exists():
-        print(f"[오류] 원본 파일을 찾을 수 없습니다: {csv_path}")
+        print(f"[Error] Source file not found: {csv_path}")
         return
 
     student_list = []
 
     try:
-        with open(csv_path, mode='r', encoding='utf-8') as f:
-            # CSV 헤더는 name, wallet으로 가정함
+        # Tally CSV는 보통 utf-8-sig 또는 utf-8을 사용합니다.
+        with open(csv_path, mode='r', encoding='utf-8-sig') as f:
             reader = csv.DictReader(f)
             for row in reader:
-                name = row.get('name', '').strip()
-                address = row.get('wallet', '').strip()
+                # Tally 실제 헤더 이름으로 수정
+                name = row.get('이름', '').strip()
+                address = row.get('지갑주소(메타마스크)', '').strip()
 
-                # 이더리움 주소 유효성 검사 (0x로 시작하고 42자리인지 확인)
+                # 주소 유효성 검사 (0x로 시작하고 42자리인지 확인)
                 if address.startswith('0x') and len(address) == 42:
                     student_list.append({
                         "name": name,
                         "wallet": address,
                         "status": "pending",
-                        "amount_eth": 0.1  # 기본 배포 수량
+                        "amount_eth": 0.1
                     })
                 else:
-                    print(f"[경고] {name} 학생의 지갑 주소가 유효하지 않습니다: {address}")
+                    # 유효하지 않은 경우 경고 메시지 출력
+                    print(f"[Warning] Invalid wallet address for: {name} ({address})")
 
         # 정제된 데이터를 JSON 파일로 저장
         with open(json_path, mode='w', encoding='utf-8') as f:
             json.dump(student_list, f, indent=4, ensure_ascii=False)
         
-        print(f"[성공] 총 {len(student_list)}명의 수강생 데이터를 처리했습니다.")
-        print(f"[안내] 결과 저장 경로: {json_path}")
+        print(f"[Success] Processed {len(student_list)} students.")
+        print(f"[Info] JSON saved to: {json_path}")
 
     except Exception as e:
-        print(f"[치명적 오류] 데이터 처리 중 오류 발생: {e}")
+        print(f"[Critical Error] {e}")
 
 if __name__ == "__main__":
-    # 파일 변환 실행
     convert_csv_to_json('students_raw.csv', 'students.json')
