@@ -34,6 +34,30 @@ cache/
 secrets.json
 mnemonic.txt
 
+# [Lecture Materials]
+# 교수님 강의자료 소스 및 결과물 제외
+*.tex
+*.snm
+*.nav
+*.toc
+*.out
+*.log
+*.aux
+*.vrb
+*.synctex.gz
+
+# [Fonts & Assets]
+# 폰트 및 이미지 자산 제외 (필요 시)
+/fonts/
+/99_Assets/
+
+# Manim Garbage & Cache
+**/animations/media/
+**/animations/pycache/
+**/*.cache
+**/*.json
+
+
 # ==========================================================
 # [주의] 02_Scripts_Admin 폴더는 동기화를 위해 제외하지 않습니다.
 # ==========================================================
