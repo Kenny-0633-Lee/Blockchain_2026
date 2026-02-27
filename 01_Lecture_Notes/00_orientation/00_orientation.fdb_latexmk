@@ -1,10 +1,11 @@
 # Fdb version 4
-["xdvipdfmx"] 1772092662.95733 "00_orientation.xdv" "00_orientation.pdf" "00_orientation" 1772092663.82096 0
-  "00_orientation.xdv" 1772092662.85504 99180 b14ae0e43d78c77218078490bebdb7c7 "xelatex"
+["xdvipdfmx"] 1772123150.79741 "00_orientation.xdv" "00_orientation.pdf" "00_orientation" 1772123151.6854 0
+  "00_orientation.xdv" 1772123150.69481 113756 31a3110326123f8d919e0511bb70e0ff "xelatex"
   (generated)
   "00_orientation.pdf"
   (rewritten before read)
-["xelatex"] 1772092660.13531 "00_orientation.tex" "00_orientation.xdv" "00_orientation" 1772092663.81791 0
+["xelatex"] 1772123148.00893 "00_orientation.tex" "00_orientation.xdv" "00_orientation" 1772123151.68267 0
+  "../../99_Assets/images/fig_ch00_DID_VC.jpg" 1772096280.05799 408618 e95f687465c65cda74d9db40db81ce0f ""
   "../../99_Assets/images/fig_ch00_driver_license.jpg" 1772084897.79449 81102 5d81a89f91bb0434e860ba48ff8f65ab ""
   "../../99_Assets/images/fig_ch00_mempool_big.png" 1772090952.09413 504768 4fa3df72a4be487d11c49320dfbdc5f5 ""
   "../../99_Assets/images/fig_ch00_mis_perception.jpg" 1772085503.26771 586057 91fb07ada8208ee2d6141674d1c48994 ""
@@ -323,11 +324,11 @@
   "/usr/local/texlive/2025/texmf-dist/web2c/texmf.cnf" 1739380943 42148 61becc7c670cd061bb319c643c27fdd4 ""
   "/usr/local/texlive/2025/texmf-var/web2c/xetex/xelatex.fmt" 1767325910 5639815 dc39db9e0956f4aabd0f790a7041fd8c ""
   "/usr/local/texlive/2025/texmf.cnf" 1741450484 577 418a7058ec8e006d8704f60ecd22c938 ""
-  "00_orientation.aux" 1772092662.8536 3170 a50e656503bfa5eb53542d7ae30dfa65 "xelatex"
-  "00_orientation.nav" 1772092662.85497 1693 4807f3cd37096fd63ef1b7cd7d19e7c2 "xelatex"
-  "00_orientation.out" 1772092662.85475 496 02f4940bb88950b900bf4aa115a2c3a1 "xelatex"
-  "00_orientation.tex" 1772092655.58846 16118 a2403287c6a24b35123407114f799bb8 ""
-  "00_orientation.vrb" 1772092662.82104 613 d3b8d9835c947ba5f670b417c572677b "xelatex"
+  "00_orientation.aux" 1772123150.69372 3509 a83c633684d03a3d63f14495a823a8d6 "xelatex"
+  "00_orientation.nav" 1772123150.69474 1881 10933eaf2dbb333a0b795e4a3bf11045 "xelatex"
+  "00_orientation.out" 1772123150.6945 496 eb0cd143a0100adeeb6001ace8b298fc "xelatex"
+  "00_orientation.tex" 1772123142.32332 30551 894475cc7fb589b2d33b48cb5cd9c6ff ""
+  "00_orientation.vrb" 1772123150.66918 613 d3b8d9835c947ba5f670b417c572677b "xelatex"
   (generated)
   "00_orientation.aux"
   "00_orientation.log"

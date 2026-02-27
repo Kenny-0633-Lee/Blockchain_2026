@@ -571,8 +571,6 @@ INPUT 00_orientation.nav
 OUTPUT 00_orientation.xdv
 INPUT ../../99_Assets/images/fig_ch00_mempool_big.png
 INPUT ../../99_Assets/images/fig_ch00_mempool_big.png
-INPUT ../../99_Assets/images/venn.pdf
-INPUT ../../99_Assets/images/venn.pdf
 INPUT /usr/local/texlive/2025/texmf-dist/tex/latex/amsfonts/umsa.fd
 INPUT /usr/local/texlive/2025/texmf-dist/tex/latex/amsfonts/umsa.fd
 INPUT /usr/local/texlive/2025/texmf-dist/tex/latex/amsfonts/umsa.fd
@@ -585,10 +583,14 @@ INPUT /usr/local/texlive/2025/texmf-dist/tex/latex/amsfonts/umsb.fd
 INPUT /usr/local/texlive/2025/texmf-dist/fonts/tfm/public/amsfonts/symbols/msbm10.tfm
 INPUT /usr/local/texlive/2025/texmf-dist/fonts/tfm/public/amsfonts/symbols/msbm7.tfm
 INPUT /usr/local/texlive/2025/texmf-dist/fonts/tfm/public/amsfonts/symbols/msbm5.tfm
+INPUT ../../99_Assets/images/venn.pdf
+INPUT ../../99_Assets/images/venn.pdf
 INPUT ../../99_Assets/images/fig_ch00_mis_perception.jpg
 INPUT ../../99_Assets/images/fig_ch00_mis_perception.jpg
 INPUT ../../99_Assets/images/fig_ch00_driver_license.jpg
 INPUT ../../99_Assets/images/fig_ch00_driver_license.jpg
+INPUT ../../99_Assets/images/fig_ch00_DID_VC.jpg
+INPUT ../../99_Assets/images/fig_ch00_DID_VC.jpg
 OUTPUT 00_orientation.vrb
 INPUT ./00_orientation.vrb
 INPUT ./00_orientation.vrb

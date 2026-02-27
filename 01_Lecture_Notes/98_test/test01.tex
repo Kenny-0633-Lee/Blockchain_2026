@@ -1,0 +1,166 @@
+\documentclass[aspectratio=169]{beamer}
+\usepackage{kotex} % 한글 출력을 위한 패키지
+\usetheme{Madrid}
+\usecolortheme{default}
+
+% Graphics 및 Code 포매팅을 위한 패키지
+\usepackage{graphicx}
+\usepackage{listings}
+\usepackage{booktabs}
+\usepackage{xcolor}
+
+% Solidity 언어 정의 추가
+\lstdefinelanguage{Solidity}{
+    morekeywords={pragma, solidity, interface, contract, function, external, view, returns, address, uint256, bool, event, indexed},
+    sensitive=true,
+    morecomment=[l]{//},
+    morecomment=[s]{/*}{*/},
+    morestring=[b]",
+    morestring=[b]'
+}
+
+% JSON 언어 정의 추가
+\lstdefinelanguage{json}{
+    morestring=[b]",
+    morestring=[d]'
+}
+
+\lstset{
+    basicstyle=\ttfamily\footnotesize,
+    keywordstyle=\color{blue},
+    stringstyle=\color{orange},
+    commentstyle=\color{green!50!black},
+    showstringspaces=false,
+    breaklines=true
+}
+
+\title[14주차: NFT (ERC-721)]{14주차: NFT (Non-Fungible Token)}
+\subtitle{Blockchain (블록체인) 기술}
+\author[Prof. Kenny]{Prof. Kenny (케니 교수)}
+\institute[KNU]{Kyungpook National University (경북대학교)}
+\date{Spring 2026}
+
+\begin{document}
+
+\begin{frame}
+    \titlepage
+\end{frame}
+
+\begin{frame}{Learning Objectives (학습 목표)}
+    \begin{itemize}
+        \item \textbf{NFT 이해:} Non-Fungible Token (대체불가능한 토큰)의 개념과 ERC-20과의 구조적 차이 이해
+        \item \textbf{ERC-721 Standard (표준):} Interface (인터페이스)와 \texttt{tokenId} 기반 Ownership (소유권) 추적 메커니즘 파악
+        \item \textbf{Metadata (메타데이터) \& IPFS:} \texttt{tokenURI} 구조와 Decentralized Storage (탈중앙화 저장소) 저장 이유
+        \item \textbf{Hands-on (실습):} Remix IDE를 통한 Smart Contract (스마트 컨트랙트) 배포 및 Sepolia Testnet (세폴리아 테스트넷) Minting (민팅) 실습
+    \end{itemize}
+\end{frame}
+
+\begin{frame}{1. NFT (Non-Fungible Token)란 무엇인가?}
+    \textbf{NFT (Non-Fungible Token)}는 Blockchain (블록체인) 위에서 고유성이 보장되는 Digital Asset (디지털 자산) 소유권 증명입니다.
+
+    \vspace{0.5cm}
+    \begin{table}[]
+        \centering
+        \begin{tabular}{@{}lll@{}}
+            \toprule
+            \textbf{Feature (구분)} & \textbf{Fungible (ERC-20)} & \textbf{Non-Fungible (ERC-721)} \\ \midrule
+            Interchangeability (대체 가능성) & 가능 (1 Token = 1 Token) & 불가능 (NFT \#1 $\neq$ NFT \#2) \\
+            Identifier (식별자) & 없음 (수량으로 관리) & \texttt{tokenId} (고유 번호) \\
+            Divisibility (분할 단위) & 소수점 가능 (Decimals) & 정수 단위만 (1개) \\
+            Balance Tracking (잔액 추적) & \texttt{balances[address]} & \texttt{owners[tokenId]} \\ \bottomrule
+        \end{tabular}
+    \end{table}
+\end{frame}
+
+\begin{frame}[fragile]{2. ERC-721 Standard Interface (표준 인터페이스)}
+    ERC-721 표준은 Ownership (소유권)과 Transfer (전송)를 관리하기 위한 필수 Function (함수)들을 정의합니다.
+    
+    \vspace{0.3cm}
+    \begin{lstlisting}[language=Solidity, caption={Core IERC721 Functions}]
+interface IERC721 {
+    // Queries
+    function balanceOf(address owner) external view returns (uint256);
+    function ownerOf(uint256 tokenId) external view returns (address);
+
+    // Transfers
+    function transferFrom(address from, address to, uint256 tokenId) external;
+    function safeTransferFrom(address from, address to, uint256 tokenId) external;
+
+    // Approvals
+    function approve(address to, uint256 tokenId) external;
+    function setApprovalForAll(address operator, bool approved) external;
+}
+    \end{lstlisting}
+\end{frame}
+
+\begin{frame}{3. Ownership Tracking (소유권 추적): ERC-20 vs ERC-721}
+    \begin{block}{ERC-20 Balance Model (잔액 모델)}
+        Address (주소)가 보유한 Token (토큰)의 \textbf{Amount (수량)}에 초점을 맞춥니다.
+        \begin{itemize}
+            \item \texttt{balances[Alice] = 1000}
+            \item \texttt{balances[Bob] = 500}
+        \end{itemize}
+    \end{block}
+
+    \begin{block}{ERC-721 Ownership Model (소유권 모델)}
+        고유한 Token (토큰)을 \textbf{누가 소유하고 있는지}에 초점을 맞춥니다.
+        \begin{itemize}
+            \item \texttt{owners[tokenId = 0] = Alice}
+            \item \texttt{owners[tokenId = 1] = Bob}
+            \item \texttt{owners[tokenId = 2] = Alice}
+        \end{itemize}
+        * \textit{Alice의 \texttt{balanceOf} 호출 결과는 2가 반환됩니다.}
+    \end{block}
+\end{frame}
+
+\begin{frame}[fragile]{4. Metadata (메타데이터)와 tokenURI}
+    On-chain (온체인)에 대용량 파일을 직접 저장하는 것은 Gas Fee (가스비)가 매우 높습니다. 따라서 Off-chain (오프체인) Metadata (메타데이터)를 가리키는 \texttt{tokenURI}만 저장합니다.
+
+    \vspace{0.3cm}
+    \begin{lstlisting}[language=json, caption={Standard Metadata JSON}]
+{
+  "name": "KNU NFT #42",
+  "description": "KNU Blockchain Technology Class Commemorative NFT",
+  "image": "ipfs://QmXxx.../image.png",
+  "attributes": [
+    { "trait_type": "Year", "value": "2026" },
+    { "trait_type": "Course", "value": "Blockchain" }
+  ]
+}
+    \end{lstlisting}
+\end{frame}
+
+\begin{frame}{5. 왜 IPFS (InterPlanetary File System)인가?}
+    \begin{columns}
+        \begin{column}{0.5\textwidth}
+            \textbf{Centralized Server (중앙화 서버 - HTTP)}
+            \begin{itemize}
+                \item Location-addressed (위치 기반 주소 지정).
+                \item \textcolor{red}{Risk (위험):} Server (서버)가 폐쇄되면 NFT Metadata (메타데이터)가 영구적으로 손실됩니다 (Broken Link).
+            \end{itemize}
+        \end{column}
+        \begin{column}{0.5\textwidth}
+            \textbf{Decentralized Storage (탈중앙화 저장소 - IPFS)}
+            \begin{itemize}
+                \item CID (Content Identifier)를 통한 Content-addressed (콘텐츠 기반 주소 지정).
+                \item \textcolor{green}{Benefit (장점):} Immutable (불변성) 및 Distributed (분산). 콘텐츠가 1바이트라도 변경되면 CID가 완전히 달라집니다.
+            \end{itemize}
+        \end{column}
+    \end{columns}
+\end{frame}
+
+\begin{frame}{6. Hands-on Session (실습 준비)}
+    \begin{center}
+        \Large \textbf{이제 실습을 시작해 봅시다!}
+    \end{center}
+    \vspace{0.5cm}
+    \textbf{오늘의 Lab (실습) 사전 준비 확인:}
+    \begin{enumerate}
+        \item Google Chrome (구글 크롬) 브라우저를 엽니다.
+        \item MetaMask (메타마스크) 로그인 후 \textbf{Sepolia Testnet (세폴리아 테스트넷)}으로 전환합니다.
+        \item Sepolia ETH (세폴리아 이더) 잔액을 확인합니다 (부족한 경우 TA(조교)에게 테스트 코인을 일괄 지급받으세요).
+        \item \texttt{https://remix.ethereum.org}에 접속합니다.
+    \end{enumerate}
+\end{frame}
+
+\end{document}

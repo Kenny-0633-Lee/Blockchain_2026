@@ -36,7 +36,7 @@ mnemonic.txt
 
 # [Lecture Materials]
 # admin 강의자료 소스 및 결과물 제외
-$*.tex
+#*.tex
 *.snm
 *.nav
 *.toc
@@ -45,6 +45,9 @@ $*.tex
 *.aux
 *.vrb
 *.synctex.gz
+*.fdb_latexmk
+*.fls
+*.xdv
 
 # [Fonts & Assets]
 # 폰트 및 이미지 자산 제외 (필요 시)
