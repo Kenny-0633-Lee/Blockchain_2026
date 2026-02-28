@@ -35,8 +35,8 @@ secrets.json
 mnemonic.txt
 
 # [Lecture Materials]
-# admin 강의자료 소스 및 결과물 제외
-#*.tex
+# admin 강의자료 소스 및 결과물 제외 : 단, 강의자료 PDF는 포함
+*.tex
 *.snm
 *.nav
 *.toc
@@ -48,11 +48,12 @@ mnemonic.txt
 *.fdb_latexmk
 *.fls
 *.xdv
+!*.pdf
 
 # [Fonts & Assets]
 # 폰트 및 이미지 자산 제외 (필요 시)
-#/fonts/
-#/99_Assets/
+/fonts/
+/99_Assets/
 
 # Manim Garbage & Cache
 **/animations/media/
