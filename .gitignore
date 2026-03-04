@@ -1,58 +1,36 @@
-# ==========================================================
-# MacBook & Windows System Files
-# ==========================================================
-.DS_Store
-Thumbs.db
-Desktop.ini
-
-# ==========================================================
-# Python & Environment
-# ==========================================================
-.venv/
+# Python
 __pycache__/
-*.pyc
-.ipynb_checkpoints/
+*.py[cod]
+.venv/
+*.egg-info/
 
-# ==========================================================
-# Node.js & Solidity Build (Truffle/Hardhat)
-# ==========================================================
+# Node.js
 node_modules/
-artifacts/
-build/
-cache/
-
-# ==========================================================
-# *** KEY & PRIVATE DATA (CRITICAL: NEVER UPLOAD) ***
-# ==========================================================
-# admin 전용 행정 데이터 및 수강생 정보
-00_Admin_Only/
-
-# 보안 및 인증 파일
 .env
-*.pem
-*.key
-secrets.json
+
+# Hardhat
+artifacts/
+cache/
+typechain-types/
+
+# macOS
+.DS_Store
+
+# VS Code
+.vscode/settings.json
+
+# 민감 정보 — 절대 커밋하지 마세요
+*.env
+.env.local
+private_key.txt
 mnemonic.txt
 
-# [Lecture Materials]
-# admin 강의자료 소스 및 결과물 제외 : 단, 강의자료 PDF는 포함
-*.tex
-*.snm
-*.nav
-*.toc
-*.out
-*.log
-*.aux
-*.vrb
-*.synctex.gz
-*.fdb_latexmk
-*.fls
-*.xdv
-!*.pdf
+# 교수용 민감 파일 (CSV, 학생 개인정보, 배포 결과)
+00_Admin_Only/*.csv
+00_Admin_Only/*.json
+!00_Admin_Only/.gitkeep
 
-
-# Manim Garbage & Cache
-**/animations/media/
-**/animations/pycache/
-**/*.cache
-**/*.json
+# 교수용 민감 파일 폴더 (CSV, 개인키 등)
+00_Admin_Only/*.csv
+00_Admin_Only/*.json
+!00_Admin_Only/.gitkeep

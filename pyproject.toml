@@ -1,10 +1,20 @@
 [project]
 name = "blockchain-2026"
 version = "0.1.0"
-description = "Add your description here"
-readme = "README.md"
-requires-python = ">=3.12"
+description = "경북대학교 블록체인 기술 강의 실습 코드 — ICAB0203-001"
+requires-python = ">=3.11"
 dependencies = [
-    "python-dotenv>=1.2.1",
-    "web3>=7.14.1",
+    "cryptography>=42.0.0",
+    "ecdsa>=0.19.0",
+    "base58>=2.1.1",
+    "mnemonic>=0.21",
+    "bip-utils>=2.9.3",
+    "web3>=6.20.0",
+    "requests>=2.31.0",
+]
+
+[tool.uv]
+dev-dependencies = [
+    "pytest>=8.0.0",
+    "ruff>=0.4.0",
 ]

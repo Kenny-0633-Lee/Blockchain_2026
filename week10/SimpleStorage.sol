@@ -1,26 +1,111 @@
 // SPDX-License-Identifier: MIT
-pragma solidity ^0.8.26; // 2026년 기준 최신 버전 가정 (0.8.x)
+pragma solidity ^0.8.20;
 
-// Lecture: Blockchain 2026
-// Week 05: Introduction to Smart Contracts
+/**
+ * @title SimpleStorage
+ * @notice 10주차 실습 — Solidity 첫 스마트 컨트랙트
+ *
+ * 학습 목표:
+ *   - Solidity 기본 문법: state variable, function, modifier
+ *   - 읽기(view) vs 쓰기 함수 차이 (가스 소비 여부)
+ *   - event와 emit — 트랜잭션 로그 기록
+ *   - Remix IDE에서 컴파일 → 배포 → 함수 호출 실습
+ *
+ * 배포: Remix IDE → Injected Provider (MetaMask Sepolia)
+ */
 contract SimpleStorage {
-    
-    // 1. State Variable (블록체인에 영구 저장되는 변수)
-    uint256 private storedData;
 
-    // 2. Event (값 변경 시 로그 남기기)
-    event DataChanged(uint256 oldValue, uint256 newValue);
+    // ── State Variables (블록체인에 영구 저장) ──
+    uint256 private storedNumber;          // 저장할 숫자
+    string  private storedMessage;         // 저장할 메시지
+    address public  owner;                 // 컨트랙트 소유자
+    uint256 public  updateCount;           // 업데이트 횟수
 
-    // 3. Setter Function (가스비 발생 O)
-    // 데이터를 블록체인에 씁니다.
-    function set(uint256 x) public {
-        emit DataChanged(storedData, x);
-        storedData = x;
+    // ── Events (트랜잭션 로그) ──
+    event NumberUpdated(address indexed by, uint256 oldValue, uint256 newValue);
+    event MessageUpdated(address indexed by, string newMessage);
+
+    // ── Constructor ──
+    constructor(uint256 _initialNumber) {
+        storedNumber = _initialNumber;
+        storedMessage = "Hello, Blockchain!";
+        owner = msg.sender;
+        updateCount = 0;
     }
 
-    // 4. Getter Function (가스비 발생 X - view)
-    // 블록체인에서 데이터를 읽기만 합니다.
-    function get() public view returns (uint256) {
-        return storedData;
+    // ── Modifier ──
+    modifier onlyOwner() {
+        require(msg.sender == owner, "Only owner can call this");
+        _;
+    }
+
+    // ── Write Functions (가스 소비) ──
+
+    /**
+     * @notice 숫자 저장
+     * @param _number 저장할 새 숫자
+     */
+    function setNumber(uint256 _number) public {
+        uint256 old = storedNumber;
+        storedNumber = _number;
+        updateCount += 1;
+        emit NumberUpdated(msg.sender, old, _number);
+    }
+
+    /**
+     * @notice 메시지 저장 (소유자만 가능)
+     * @param _message 저장할 메시지 문자열
+     */
+    function setMessage(string memory _message) public onlyOwner {
+        storedMessage = _message;
+        emit MessageUpdated(msg.sender, _message);
+    }
+
+    /**
+     * @notice 숫자를 1 증가
+     */
+    function increment() public {
+        uint256 old = storedNumber;
+        storedNumber += 1;
+        updateCount += 1;
+        emit NumberUpdated(msg.sender, old, storedNumber);
+    }
+
+    /**
+     * @notice 숫자를 초기화 (소유자만)
+     */
+    function reset() public onlyOwner {
+        uint256 old = storedNumber;
+        storedNumber = 0;
+        updateCount += 1;
+        emit NumberUpdated(msg.sender, old, 0);
+    }
+
+    // ── Read Functions (가스 없음) ──
+
+    /**
+     * @notice 저장된 숫자 반환
+     */
+    function getNumber() public view returns (uint256) {
+        return storedNumber;
+    }
+
+    /**
+     * @notice 저장된 메시지 반환
+     */
+    function getMessage() public view returns (string memory) {
+        return storedMessage;
+    }
+
+    /**
+     * @notice 현재 상태 전체 반환
+     */
+    function getState() public view returns (
+        uint256 number,
+        string memory message,
+        address contractOwner,
+        uint256 count
+    ) {
+        return (storedNumber, storedMessage, owner, updateCount);
     }
 }
