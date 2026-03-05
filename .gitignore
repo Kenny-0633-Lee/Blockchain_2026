@@ -29,8 +29,5 @@ mnemonic.txt
 00_Admin_Only/*.csv
 00_Admin_Only/*.json
 !00_Admin_Only/.gitkeep
+instructor/
 
-# 교수용 민감 파일 폴더 (CSV, 개인키 등)
-00_Admin_Only/*.csv
-00_Admin_Only/*.json
-!00_Admin_Only/.gitkeep
