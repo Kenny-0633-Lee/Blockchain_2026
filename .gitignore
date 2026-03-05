@@ -29,5 +29,7 @@ mnemonic.txt
 00_Admin_Only/*.csv
 00_Admin_Only/*.json
 !00_Admin_Only/.gitkeep
-instructor/
+00_Scripts/*.py
+!00_Scripts/README.md
+docs/images/
 
