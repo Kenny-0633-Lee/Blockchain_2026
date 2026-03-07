@@ -31,5 +31,3 @@ mnemonic.txt
 !00_Admin_Only/.gitkeep
 00_Scripts/*.py
 !00_Scripts/README.md
-docs/images/
-
