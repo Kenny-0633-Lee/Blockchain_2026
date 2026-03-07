@@ -27,7 +27,7 @@ Blockchain_2026/
 
 > 모든 강의 자료, 실습 가이드, 환경 설정, FAQ는 **Notion 허브**에서 확인하세요.
 
-### 👉 [https://kenny-lee.notion.site/blockchain-knu2026]
+### 👉 <a href="https://kenny-lee.notion.site/blockchain-knu2026" target="_blank">https://kenny-lee.notion.site/blockchain-knu2026</a>
 
 > 이 저장소는 **실습 코드** 전용입니다.
 > 강의노트·실습 가이드·제출 방법은 모두 Notion 허브의 해당 페이지/카드를 찾아서 참조하시기 바랍니다.
@@ -328,18 +328,18 @@ node scripts/query_balance.js
 
 ## 🔗 주요 링크
 
-| 이름                      | 링크                                             |
-| ------------------------- | ------------------------------------------------ |
-| 📝 **강의 허브 (Notion)** | https://kenny-lee.notion.site/blockchain-knu2026 |
-| Sepolia Etherscan         | https://sepolia.etherscan.io                     |
-| Remix IDE                 | https://remix.ethereum.org                       |
-| Bitcoin Testnet4 Mempool  | https://mempool.space/testnet4                   |
-| OpenSea Testnet           | https://testnets.opensea.io                      |
-| Sepolia Faucet (Alchemy)  | https://www.alchemy.com/faucets/ethereum-sepolia |
-| Bitcoin Testnet4 Faucet   | https://mempool.space/testnet4/faucet            |
-| Electrum                  | https://electrum.org/#download                   |
-| Hardhat 문서              | https://hardhat.org/docs                         |
-| ethers.js v6              | https://docs.ethers.org/v6                       |
+| 이름                      | 링크                                                                                                                            |
+| ------------------------- | ------------------------------------------------------------------------------------------------------------------------------- |
+| 📝 **강의 허브 (Notion)** | <a href="https://kenny-lee.notion.site/blockchain-knu2026" target="_blank">https://kenny-lee.notion.site/blockchain-knu2026</a> |
+| Sepolia Etherscan         | <a href="https://sepolia.etherscan.io" target="_blank">https://sepolia.etherscan.io</a>                                         |
+| Remix IDE                 | <a href="https://remix.ethereum.org" target="_blank">https://remix.ethereum.org</a>                                             |
+| Bitcoin Testnet4 Mempool  | <a href="https://mempool.space/testnet4" target="_blank">https://mempool.space/testnet4</a>                                     |
+| OpenSea Testnet           | <a href="https://testnets.opensea.io" target="_blank">https://testnets.opensea.io</a>                                           |
+| Sepolia Faucet (Alchemy)  | <a href="https://www.alchemy.com/faucets/ethereum-sepolia" target="_blank">https://www.alchemy.com/faucets/ethereum-sepolia</a> |
+| Bitcoin Testnet4 Faucet   | <a href="https://mempool.space/testnet4/faucet" target="_blank">https://mempool.space/testnet4/faucet</a>                       |
+| Electrum                  | <a href="https://electrum.org/#download" target="_blank">https://electrum.org/#download</a>                                     |
+| Hardhat 문서              | <a href="https://hardhat.org/docs" target="_blank">https://hardhat.org/docs</a>                                                 |
+| ethers.js v6              | <a href="https://docs.ethers.org/v6" target="_blank">https://docs.ethers.org/v6</a>                                             |
 
 ---
 
@@ -384,18 +384,6 @@ uv run python week03/merkle_tree.py
 | `base58`       | Bitcoin 주소 인코딩    | 5주차      |
 | `mnemonic`     | BIP-39 니모닉 생성     | 5주차      |
 | `bip-utils`    | HD Wallet 파생 경로    | 5주차      |
-
----
-
-## 🔗 주요 링크
-
-| 링크                     | 주소                           |
-| ------------------------ | ------------------------------ |
-| 강의 노트 (Notion)       | 수업 중 공유                   |
-| Sepolia Etherscan        | https://sepolia.etherscan.io   |
-| Remix IDE                | https://remix.ethereum.org     |
-| Bitcoin Testnet4 Mempool | https://mempool.space/testnet4 |
-| OpenSea Testnet          | https://testnets.opensea.io    |
 
 ---
 
