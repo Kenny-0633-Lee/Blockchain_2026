@@ -4,33 +4,14 @@
 
 ---
 
-## 📁 저장소 Lecture Deck 구조
-
-```
-Blockchain_2026/
-├── week01/   1주차 — MetaMask + Sepolia ETH 수령
-├── week02/   2주차 — 개발 환경 구축
-├── week03/   3주차 — Merkle Tree 구현 (Python)
-├── week04/   4주차 — SHA-256 Avalanche Effect (Python)
-├── week05/   5주차 — BIP-39 + ECDSA + Bitcoin 주소 도출 (Python)
-├── week06/   6주차 — PoW 채굴 시뮬레이터 (Python)
-├── week07/   7주차 — Electrum Testnet 실습 가이드
-├── week09/   9주차 — Sepolia 가스 시스템 실습 가이드
-├── week10/   10주차 — SimpleStorage.sol (Remix)
-├── week11/   11주차 — Hardhat 로컬 개발 환경
-├── week12/   12주차 — ethers.js + DApp 연동
-├── week13/   13주차 — KNU Token ERC-20
-└── week14/   14주차 — KNU NFT ERC-721
-```
-
 ## 📚 강의 허브 (Notion)
 
 > 모든 강의 자료, 실습 가이드, 환경 설정, FAQ는 **Notion 허브**에서 확인하세요.
 
-### 👉 <a href="https://kenny-lee.notion.site/blockchain-knu2026" target="_blank">https://kenny-lee.notion.site/blockchain-knu2026</a>
+### 👉 [https://kenny-lee.notion.site/blockchain-knu2026](https://kenny-lee.notion.site/blockchain-knu2026)
 
 > 이 저장소는 **실습 코드** 전용입니다.
-> 강의노트·실습 가이드·제출 방법은 모두 Notion 허브의 해당 페이지/카드를 찾아서 참조하시기 바랍니다.
+> 강의노트·실습 가이드·제출 방법은 모두 Notion 허브를 참조하세요.
 
 ---
 
@@ -38,7 +19,7 @@ Blockchain_2026/
 
 ### 사전 준비 (Week 2 환경 구축 완료 필수)
 
-환경 설정이 되지 않은 경우 → [Notion 허브 > 환경 설정 가이드]
+환경 설정이 되지 않은 경우 → [Notion 허브 > 환경 설정 가이드](https://kenny-lee.notion.site/blockchain-knu2026) 참조
 
 ### Python 실습 (3~6주차)
 
@@ -76,7 +57,7 @@ uv run python week03/merkle_tree.py
 | 코드 | 없음 (GUI 실습)                                             |
 | 과제 | MetaMask 잔액 + Etherscan 트랜잭션 스크린샷                 |
 
-> 📖 [Notion 허브 > 1주차 강의자료]
+> 📖 [Notion 허브 > 1주차 강의자료](https://kenny-lee.notion.site/blockchain-knu2026)
 
 ---
 
@@ -93,7 +74,7 @@ uv run python week03/merkle_tree.py
 uv run python week02/blockchain_simulator.py
 ```
 
-> 📖 [Notion 허브 > 2주차 강의자료]
+> 📖 [Notion 허브 > 2주차 강의자료](https://kenny-lee.notion.site/blockchain-knu2026)
 
 ---
 
@@ -110,7 +91,7 @@ uv run python week02/blockchain_simulator.py
 uv run python week03/merkle_tree.py
 ```
 
-> 📖 [Notion 허브 > 3주차 강의자료]
+> 📖 [Notion 허브 > 3주차 강의자료](https://kenny-lee.notion.site/blockchain-knu2026)
 
 ---
 
@@ -129,7 +110,7 @@ uv add cryptography
 uv run python week04/sha256_aes.py
 ```
 
-> 📖 [Notion 허브 > 4주차 강의자료]
+> 📖 [Notion 허브 > 4주차 강의자료](https://kenny-lee.notion.site/blockchain-knu2026)
 
 ---
 
@@ -147,7 +128,7 @@ uv run python week05/bip39_ecdsa_address.py
 ```
 
 > ⚠️ 실습용 니모닉은 실제 자산 보관 금지
-> 📖 [Notion 허브 > 5주차 강의자료]
+> 📖 [Notion 허브 > 5주차 강의자료](https://kenny-lee.notion.site/blockchain-knu2026)
 
 ---
 
@@ -164,7 +145,7 @@ uv run python week05/bip39_ecdsa_address.py
 uv run python week06/pow_simulator.py
 ```
 
-> 📖 [Notion 허브 > 6주차 강의자료]
+> 📖 [Notion 허브 > 6주차 강의자료](https://kenny-lee.notion.site/blockchain-knu2026)
 
 ---
 
@@ -188,7 +169,7 @@ uv run python week06/pow_simulator.py
 open -a Electrum --args --testnet
 ```
 
-> 📖 [Notion 허브 > 7주차 강의자료]
+> 📖 [Notion 허브 > 7주차 강의자료](https://kenny-lee.notion.site/blockchain-knu2026)
 
 ---
 
@@ -200,7 +181,7 @@ open -a Electrum --args --testnet
 | 형식      | 필기시험          |
 | 코드      | 없음              |
 
-> 📖 [LMS 혹은 Notion 허브 > 시험 범위 공지]
+> 📖 [Notion 허브 > 시험 범위 공지](https://kenny-lee.notion.site/blockchain-knu2026)
 
 ---
 
@@ -213,7 +194,7 @@ open -a Electrum --args --testnet
 | 코드 | 없음 (GUI + Etherscan 실습)                                   |
 | 과제 | Etherscan 트랜잭션 링크 (본인 주소 트랜잭션 1건)              |
 
-> 📖 [Notion 허브 > 9주차 강의자료]
+> 📖 [Notion 허브 > 9주차 강의자료](https://kenny-lee.notion.site/blockchain-knu2026)
 
 ---
 
@@ -227,7 +208,7 @@ open -a Electrum --args --testnet
 | 과제 | 배포된 컨트랙트 주소 제출                                |
 
 > 브라우저 기반 (설치 불필요): https://remix.ethereum.org
-> 📖 [Notion 허브 > 10주차 강의자료]
+> 📖 [Notion 허브 > 10주차 강의자료](https://kenny-lee.notion.site/blockchain-knu2026)
 
 ---
 
@@ -248,7 +229,7 @@ npx hardhat test
 npx hardhat run scripts/deploy.js --network sepolia
 ```
 
-> 📖 [Notion 허브 > 11주차 강의자료]
+> 📖 [Notion 허브 > 11주차 강의자료](https://kenny-lee.notion.site/blockchain-knu2026)
 
 ---
 
@@ -268,7 +249,7 @@ npm install
 node scripts/query_balance.js
 ```
 
-> 📖 [Notion 허브 > 12주차 강의자료]
+> 📖 [Notion 허브 > 12주차 강의자료](https://kenny-lee.notion.site/blockchain-knu2026)
 
 ---
 
@@ -282,21 +263,21 @@ node scripts/query_balance.js
 | 과제 | 배포된 KNUT 컨트랙트 주소 제출                                |
 
 > 브라우저 기반: https://remix.ethereum.org
-> 📖 [Notion 허브 > 13주차 강의자료]
+> 📖 [Notion 허브 > 13주차 강의자료](https://kenny-lee.notion.site/blockchain-knu2026)
 
 ---
 
 ### Week 14 — NFT (ERC-721) + Pinata
 
-| 항목 | 내용                                                                |
-| ---- | ------------------------------------------------------------------- |
-| 주제 | Ch.10 & 15 ERC-721 표준, IPFS, Pinata 메타데이터                    |
-| 실습 | Pinata 이미지 업로드 → 메타데이터 생성 → KNUNFT 민팅 → OpenSea 확인 |
-| 코드 | `week14/KNUNFT.sol`                                                 |
-| 과제 | KNUNFT 컨트랙트 주소 + OpenSea Testnet 링크                         |
+| 항목 | 내용                                                                                         |
+| ---- | -------------------------------------------------------------------------------------------- |
+| 주제 | Ch.10 & 15 ERC-721 표준, IPFS, Pinata 메타데이터                                             |
+| 실습 | Pinata 이미지 업로드 → 메타데이터 생성 → KNUNFT 민팅 → Etherscan 확인 (또는 Rarible Testnet) |
+| 코드 | `week14/KNUNFT.sol`                                                                          |
+| 과제 | KNUNFT 컨트랙트 주소 + Etherscan tokenURI 확인 화면 (또는 Rarible Testnet 링크)              |
 
 > 브라우저 기반: https://remix.ethereum.org / https://pinata.cloud
-> 📖 [Notion 허브 > 14주차 강의자료]
+> 📖 [Notion 허브 > 14주차 강의자료](https://kenny-lee.notion.site/blockchain-knu2026)
 
 ---
 
@@ -308,7 +289,7 @@ node scripts/query_balance.js
 | 형식      | 필기시험 또는 텀프로젝트 발표 (학기 초 결정) |
 | 코드      | 없음                                         |
 
-> 📖 [Notion 허브 > 시험 범위 공지]
+> 📖 [Notion 허브 > 시험 범위 공지](https://kenny-lee.notion.site/blockchain-knu2026)
 
 ---
 
@@ -328,18 +309,18 @@ node scripts/query_balance.js
 
 ## 🔗 주요 링크
 
-| 이름                      | 링크                                                                                                                            |
-| ------------------------- | ------------------------------------------------------------------------------------------------------------------------------- |
-| 📝 **강의 허브 (Notion)** | <a href="https://kenny-lee.notion.site/blockchain-knu2026" target="_blank">https://kenny-lee.notion.site/blockchain-knu2026</a> |
-| Sepolia Etherscan         | <a href="https://sepolia.etherscan.io" target="_blank">https://sepolia.etherscan.io</a>                                         |
-| Remix IDE                 | <a href="https://remix.ethereum.org" target="_blank">https://remix.ethereum.org</a>                                             |
-| Bitcoin Testnet4 Mempool  | <a href="https://mempool.space/testnet4" target="_blank">https://mempool.space/testnet4</a>                                     |
-| OpenSea Testnet           | <a href="https://testnets.opensea.io" target="_blank">https://testnets.opensea.io</a>                                           |
-| Sepolia Faucet (Alchemy)  | <a href="https://www.alchemy.com/faucets/ethereum-sepolia" target="_blank">https://www.alchemy.com/faucets/ethereum-sepolia</a> |
-| Bitcoin Testnet4 Faucet   | <a href="https://mempool.space/testnet4/faucet" target="_blank">https://mempool.space/testnet4/faucet</a>                       |
-| Electrum                  | <a href="https://electrum.org/#download" target="_blank">https://electrum.org/#download</a>                                     |
-| Hardhat 문서              | <a href="https://hardhat.org/docs" target="_blank">https://hardhat.org/docs</a>                                                 |
-| ethers.js v6              | <a href="https://docs.ethers.org/v6" target="_blank">https://docs.ethers.org/v6</a>                                             |
+| 이름                           | 링크                                             |
+| ------------------------------ | ------------------------------------------------ |
+| 📝 **강의 허브 (Notion)**      | https://kenny-lee.notion.site/blockchain-knu2026 |
+| Sepolia Etherscan              | https://sepolia.etherscan.io                     |
+| Remix IDE                      | https://remix.ethereum.org                       |
+| Bitcoin Testnet4 Mempool       | https://mempool.space/testnet4                   |
+| Rarible Testnet (OpenSea 대체) | https://testnet.rarible.com                      |
+| Sepolia Faucet (Alchemy)       | https://www.alchemy.com/faucets/ethereum-sepolia |
+| Bitcoin Testnet4 Faucet        | https://mempool.space/testnet4/faucet            |
+| Electrum                       | https://electrum.org/#download                   |
+| Hardhat 문서                   | https://hardhat.org/docs                         |
+| ethers.js v6                   | https://docs.ethers.org/v6                       |
 
 ---
 
@@ -356,44 +337,3 @@ node scripts/query_balance.js
 > 📌 `instructor/` 폴더는 교수 전용 private 브랜치에서 관리됩니다.
 
 _최종 업데이트: 2026-03-07 | 코드셋 버전: v0.93 | ICAB0203-001_
-
----
-
-## 🚀 빠른 시작 (Python 실습 — 3~6주차)
-
-```powershell
-# 1. 저장소 클론
-git clone https://github.com/Kenny-0633-Lee/Blockchain_2026.git
-cd Blockchain_2026
-
-# 2. uv로 가상환경 생성 및 패키지 설치
-uv sync
-
-# 3. 실습 코드 실행 예시 (3주차)
-uv run python week03/merkle_tree.py
-```
-
----
-
-## 📦 Python 패키지 목록
-
-| 패키지         | 용도                   | 주차       |
-| -------------- | ---------------------- | ---------- |
-| `cryptography` | 암호화 기본 라이브러리 | 4주차 이후 |
-| `ecdsa`        | 타원곡선 서명          | 5주차      |
-| `base58`       | Bitcoin 주소 인코딩    | 5주차      |
-| `mnemonic`     | BIP-39 니모닉 생성     | 5주차      |
-| `bip-utils`    | HD Wallet 파생 경로    | 5주차      |
-
----
-
-## 👨‍🏫 교수 정보
-
--**e-mail 주소:** infosec@knu.ac.kr
-
-- **Sepolia 주소:** `0x21d9795E987694a2a8E1ad7FF2250c953D166896`
-- **Bitcoin Testnet4 주소:** `tb1qwqnjsfm5l4mf3m5n28vpkjd0hvqep5acx8nx97`
-
----
-
-_최종 업데이트: 2026-03-04 | v0.1_
