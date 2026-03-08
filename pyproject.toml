@@ -1,21 +1,93 @@
+# =============================================================================
+# pyproject.toml
+# 저장 위치: Blockchain_2026/pyproject.toml  (저장소 루트)
+# GitHub URL: https://github.com/Kenny-0633-Lee/Blockchain_2026/blob/main/pyproject.toml
+#
+# 사용법:
+#   git clone https://github.com/Kenny-0633-Lee/Blockchain_2026.git
+#   cd Blockchain_2026
+#   uv sync          ← .venv 생성 + 모든 패키지 일괄 설치 (W02~W06 전체)
+#   uv run python week04/sha256_aes.py  ← 이후 매 주차 실행
+#
+# 이 파일을 수정하면 반드시 `uv sync` 를 다시 실행하세요.
+# uv.lock 파일도 함께 커밋해야 모든 환경에서 동일한 버전이 설치됩니다.
+# =============================================================================
+
 [project]
-name = "blockchain-2026"
-version = "0.1.0"
-description = "경북대학교 블록체인 기술 강의 실습 코드 — ICAB0203-001"
+name        = "blockchain-knu2026"
+version     = "0.93.0"
+description = "경북대학교 블록체인 강의 실습 코드 — ICAB0203-001 (2026년 1학기)"
 requires-python = ">=3.11"
+
+# ── Python 실습 공통 의존성 (W02~W06) ─────────────────────────────────────────────
+#
+# 주차별 최초 등장 패키지:
+#   W02: hashlib, json, time, datetime  →  Python 표준 라이브러리 (별도 설치 불필요)
+#   W03: hashlib                        →  표준 라이브러리
+#   W04: cryptography                   →  AES-CBC, HMAC-SHA256
+#   W05: ecdsa, base58, mnemonic,       →  ECDSA 서명, Bitcoin 주소, BIP-39 니모닉
+#         bip-utils
+#   W06: hashlib, time                  →  표준 라이브러리
+#
+# W11~W14 (Hardhat, ethers.js)는 Node.js 기반이므로 이 파일 범위 밖입니다.
+#   → package.json 은 week11/ 폴더 안에 별도 관리합니다.
+# ──────────────────────────────────────────────────────────────────────────────
 dependencies = [
+    # W04: 대칭키 암호 (AES-256-CBC, HMAC-SHA256)
     "cryptography>=42.0.0",
+
+    # W05: 비대칭키 암호 (ECDSA secp256k1)
     "ecdsa>=0.19.0",
+
+    # W05: Bitcoin 주소 Base58Check 인코딩
     "base58>=2.1.1",
+
+    # W05: BIP-39 니모닉 생성 (12단어 시드 구문)
     "mnemonic>=0.21",
+
+    # W05: BIP-32/44 HD Wallet 키 파생 (니모닉 → 개인키 경로)
     "bip-utils>=2.9.3",
-    "web3>=6.20.0",
-    "requests>=2.31.0",
-    "dotenv>=0.9.9",
 ]
 
-[tool.uv]
-dev-dependencies = [
-    "pytest>=8.0.0",
+# ── 선택적 개발 도구 (교수 전용, 학생 설치 불필요) ────────────────────────────
+[project.optional-dependencies]
+dev = [
+    # 코드 포매터 / 린터
     "ruff>=0.4.0",
+    # 타입 체커
+    "mypy>=1.10.0",
+    # 단위 테스트
+    "pytest>=8.2.0",
 ]
+
+# instructor 스크립트 전용 의존성
+instructor = [
+    # Week 01: Sepolia ETH 자동 배포 (web3.py 기반 Python 스크립트용)
+    "web3>=6.20.0",
+    # Week 14: Pinata IPFS 업로드
+    "requests>=2.32.0",
+]
+
+# ── uv 설정 ───────────────────────────────────────────────────────────────────
+[tool.uv]
+# Python 3.11 이상을 자동 선택 (3.12도 허용)
+python-preference = "managed"
+
+# ── Ruff 린터 설정 (선택 설치 시 적용) ───────────────────────────────────────
+[tool.ruff]
+line-length = 100
+target-version = "py311"
+
+[tool.ruff.lint]
+select = ["E", "F", "W"]
+ignore = ["E501"]   # 긴 줄 허용 (교육 코드 특성상 주석이 길 수 있음)
+
+# ── Pytest 설정 ───────────────────────────────────────────────────────────────
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+python_files = ["test_*.py"]
+
+# ── 빌드 시스템 (uv 호환) ─────────────────────────────────────────────────────
+[build-system]
+requires      = ["hatchling"]
+build-backend = "hatchling.build"
