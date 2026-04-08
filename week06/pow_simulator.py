@@ -24,6 +24,7 @@ import statistics
 # 헬퍼
 # ──────────────────────────────────────────────
 
+
 def sha256(data: str) -> str:
     return hashlib.sha256(data.encode("utf-8")).hexdigest()
 
@@ -35,16 +36,13 @@ def mine_block(block_data: dict, difficulty: int) -> tuple[int, str, float]:
     Returns:
         (nonce, winning_hash, elapsed_seconds)
     """
-    prefix  = "0" * difficulty
-    nonce   = 0
-    start   = time.time()
+    prefix = "0" * difficulty
+    nonce = 0
+    start = time.time()
 
     while True:
         content = (
-            f"{block_data['index']}"
-            f"{block_data['data']}"
-            f"{block_data['prev_hash']}"
-            f"{nonce}"
+            f"{block_data['index']}{block_data['data']}{block_data['prev_hash']}{nonce}"
         )
         h = sha256(content)
         if h.startswith(prefix):
@@ -65,18 +63,19 @@ def print_separator(title: str = "") -> None:
 # 1. 기본 채굴 시연
 # ──────────────────────────────────────────────
 
+
 def demo_basic_mining():
     print_separator("데모 1: 단일 블록 채굴")
 
     block = {
-        "index":     1,
-        "data":      "Alice → Bob: 1.5 BTC",
+        "index": 1,
+        "data": "Alice → Bob: 1.5 BTC",
         "prev_hash": "0" * 64,
     }
     difficulty = 4
 
     print(f"블록 데이터: '{block['data']}'")
-    print(f"난이도: {difficulty} (해시 앞 {difficulty}자리 = '{'0'*difficulty}')")
+    print(f"난이도: {difficulty} (해시 앞 {difficulty}자리 = '{'0' * difficulty}')")
     print(f"\n채굴 시작...", end="", flush=True)
 
     nonce, winning_hash, elapsed = mine_block(block, difficulty)
@@ -85,7 +84,7 @@ def demo_basic_mining():
     print(f"  Nonce:       {nonce:,}")
     print(f"  해시:        {winning_hash}")
     print(f"  소요 시간:   {elapsed:.3f}초")
-    print(f"  초당 해시:   {nonce/elapsed:,.0f} H/s")
+    print(f"  초당 해시:   {nonce / elapsed:,.0f} H/s")
 
     print(f"""
 💡 핵심:
@@ -99,21 +98,26 @@ def demo_basic_mining():
 # 2. 난이도별 채굴 시간 측정
 # ──────────────────────────────────────────────
 
+
 def demo_difficulty_vs_time():
     print_separator("데모 2: 난이도별 채굴 시간 측정")
 
     block = {"index": 1, "data": "test", "prev_hash": "0" * 64}
-    max_difficulty = 5
+    max_difficulty = 6
     results = []
 
-    print(f"{'난이도':>6} | {'Nonce':>10} | {'시간(초)':>10} | {'H/s':>12} | 해시(앞 20자)")
+    print(
+        f"{'난이도':>6} | {'Nonce':>10} | {'시간(초)':>10} | {'H/s':>12} | 해시(앞 20자)"
+    )
     print("-" * 75)
 
     for diff in range(1, max_difficulty + 1):
         nonce, h, elapsed = mine_block(block, diff)
         hps = nonce / elapsed if elapsed > 0 else 0
         results.append((diff, nonce, elapsed, hps))
-        print(f"  {diff:4d}   | {nonce:10,} | {elapsed:10.3f} | {hps:12,.0f} | {h[:20]}...")
+        print(
+            f"  {diff:4d}   | {nonce:10,} | {elapsed:10.3f} | {hps:12,.0f} | {h[:20]}..."
+        )
 
     print(f"""
 💡 난이도 1 증가(hex 0 추가) = 기대 탐색 횟수 16배 증가 (16진수 한 자리 = 4비트)
@@ -125,6 +129,7 @@ Bitcoin 실제 난이도: 약 76비트(hex 19자리) → 2^76 ≈ 7.5×10^22 번
 # ──────────────────────────────────────────────
 # 3. 블록체인 채굴 시뮬레이션 (5블록)
 # ──────────────────────────────────────────────
+
 
 def demo_blockchain_mining():
     print_separator("데모 3: 5블록 연속 채굴 (블록체인 구성)")
@@ -138,38 +143,43 @@ def demo_blockchain_mining():
         "Eve → Alice: 1.2 BTC",
     ]
 
-    print(f"난이도: {difficulty} (앞 {difficulty}자리 = '{'0'*difficulty}')\n")
-    print(f"{'#':>3} | {'Nonce':>8} | {'시간(초)':>8} | {'해시(앞 24자)':24s} | 트랜잭션")
+    print(f"난이도: {difficulty} (앞 {difficulty}자리 = '{'0' * difficulty}')\n")
+    print(
+        f"{'#':>3} | {'Nonce':>8} | {'시간(초)':>8} | {'해시(앞 24자)':24s} | 트랜잭션"
+    )
     print("-" * 90)
 
     blockchain = []
     prev_hash = "0" * 64
 
     for i, tx in enumerate(transactions):
-        block = {"index": i+1, "data": tx, "prev_hash": prev_hash}
+        block = {"index": i + 1, "data": tx, "prev_hash": prev_hash}
         nonce, h, elapsed = mine_block(block, difficulty)
         blockchain.append({**block, "nonce": nonce, "hash": h})
         prev_hash = h
-        print(f"  {i+1:1d} | {nonce:8,} | {elapsed:8.3f} | {h[:24]} | {tx}")
+        print(f"  {i + 1:1d} | {nonce:8,} | {elapsed:8.3f} | {h[:24]} | {tx}")
 
     print(f"\n✅ {len(transactions)}개 블록 채굴 완료!")
     print(f"\n🔗 체인 구조 (해시 포인터):")
     for b in blockchain:
-        print(f"  Block {b['index']}: ...{b['hash'][-8:]} ← prev: ...{b['prev_hash'][-8:]}")
+        print(
+            f"  Block {b['index']}: ...{b['hash'][-8:]} ← prev: ...{b['prev_hash'][-8:]}"
+        )
 
 
 # ──────────────────────────────────────────────
 # 4. 통계 실험: 샘플링으로 기댓값 검증
 # ──────────────────────────────────────────────
 
+
 def demo_statistics():
     print_separator("데모 4: 통계 실험 — 기댓값 vs 실측값")
 
-    difficulty = 2   # 앞 2자리 = '00': 기대 탐색 횟수 = 16^2 = 256
-    expected   = 16 ** difficulty
-    samples    = 30
+    difficulty = 2  # 앞 2자리 = '00': 기대 탐색 횟수 = 16^2 = 256
+    expected = 16**difficulty
+    samples = 30
 
-    print(f"난이도 {difficulty} (앞 {difficulty}자리 = '{'0'*difficulty}')")
+    print(f"난이도 {difficulty} (앞 {difficulty}자리 = '{'0' * difficulty}')")
     print(f"이론적 기대 탐색 횟수: {expected:,}회")
     print(f"\n{samples}회 반복 채굴 실험...\n")
 
@@ -181,8 +191,8 @@ def demo_statistics():
 
     mean_ = statistics.mean(nonce_list)
     stdev = statistics.stdev(nonce_list)
-    min_  = min(nonce_list)
-    max_  = max(nonce_list)
+    min_ = min(nonce_list)
+    max_ = max(nonce_list)
 
     print(f"  실험 횟수: {samples}회")
     print(f"  평균 Nonce: {mean_:,.1f}  (기댓값: {expected:,})")
@@ -200,6 +210,7 @@ def demo_statistics():
 # ──────────────────────────────────────────────
 # 5. PoW vs PoS 비교
 # ──────────────────────────────────────────────
+
 
 def demo_pos_comparison():
     print_separator("데모 5: PoW vs PoS 비교")
