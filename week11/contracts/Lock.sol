@@ -1,34 +1,34 @@
-// SPDX-License-Identifier: MIT
-pragma solidity ^0.8.20;
+// SPDX-License-Identifier: UNLICENSED
+pragma solidity ^0.8.28;
 
-/**
- * @title Lock
- * @notice 11주차 실습 — Hardhat 로컬 개발 기본 컨트랙트
- *
- * 기능: 특정 시간까지 ETH를 잠금, 이후 소유자가 인출 가능
- * 교육 목적: Hardhat 테스트, 배포 스크립트, 이벤트 활용 방법 학습
- */
+// Uncomment this line to use console.log
+// import "hardhat/console.sol";
+
 contract Lock {
-    uint256 public unlockTime;
+    uint public unlockTime;
     address payable public owner;
 
-    event Withdrawal(uint256 amount, uint256 when);
+    event Withdrawal(uint amount, uint when);
 
-    constructor(uint256 _unlockTime) payable {
+    constructor(uint _unlockTime) payable {
         require(
             block.timestamp < _unlockTime,
             "Unlock time should be in the future"
         );
+
         unlockTime = _unlockTime;
         owner = payable(msg.sender);
     }
 
     function withdraw() public {
+        // Uncomment this line, and the import of "hardhat/console.sol", to print a log in your terminal
+        // console.log("Unlock time is %o and block timestamp is %o", unlockTime, block.timestamp);
+
         require(block.timestamp >= unlockTime, "You can't withdraw yet");
         require(msg.sender == owner, "You aren't the owner");
 
-        uint256 amount = address(this).balance;
-        emit Withdrawal(amount, block.timestamp);
-        owner.transfer(amount);
+        emit Withdrawal(address(this).balance, block.timestamp);
+
+        owner.transfer(address(this).balance);
     }
 }
