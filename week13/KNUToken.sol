@@ -16,13 +16,12 @@ pragma solidity ^0.8.20;
  * OpenZeppelin Import: Remix가 자동으로 GitHub에서 다운로드
  */
 
-import "https://github.com/OpenZeppelin/openzeppelin-contracts/blob/v5.0.0/contracts/token/ERC20/ERC20.sol";
-import "https://github.com/OpenZeppelin/openzeppelin-contracts/blob/v5.0.0/contracts/access/Ownable.sol";
+import "@openzeppelin/contracts/token/ERC20/ERC20.sol";
+import "@openzeppelin/contracts/access/Ownable.sol";
 
 contract KNUToken is ERC20, Ownable {
-
     // ── 상수 ──
-    uint256 public constant MAX_SUPPLY = 100_000_000 * 10 ** 18;  // 1억 KNUT 최대 발행량
+    uint256 public constant MAX_SUPPLY = 100_000_000 * 10 ** 18; // 1억 KNUT 최대 발행량
 
     // ── 이벤트 (ERC-20 기본 외 추가) ──
     event TokensMinted(address indexed to, uint256 amount);
@@ -32,10 +31,9 @@ contract KNUToken is ERC20, Ownable {
      * @param initialSupply 초기 발행량 (단위: KNUT, 내부에서 10^18 곱함)
      * constructor 예시: initialSupply = 1000000 → 1,000,000 KNUT 발행
      */
-    constructor(uint256 initialSupply)
-        ERC20("KNU Token", "KNUT")
-        Ownable(msg.sender)
-    {
+    constructor(
+        uint256 initialSupply
+    ) ERC20("KNU Token", "KNUT") Ownable(msg.sender) {
         require(
             initialSupply * 10 ** decimals() <= MAX_SUPPLY,
             "Exceeds maximum supply"
