@@ -107,13 +107,14 @@ contract KNUNFT is ERC721URIStorage, Ownable {
  * NFT 메타데이터 JSON 형식 (ERC-721 Metadata Standard)
  * ─────────────────────────────────────────────
  *
- * {
- *   "name": "KNU NFT #0",
- *   "description": "경북대 블록체인 기술 강의 2026 — 수료 기념 NFT",
- *   "image": "ipfs://[이미지-CID]",
- *   "attributes": [
- *     {"trait_type": "Year",    "value": "2026"},
- *     {"trait_type": "Course",  "value": "ICAB0203-001"}
- *   ]
- * }
- */
+* {
+*    "name": "KNU NFT #본인_학번_끝네자리",
+*    "description": "경북대학교 블록체인 기술 수업 NFT",
+*    "image": "ipfs://본인_이미지_CID",
+*    "attributes": [
+*        { "trait_type": "Course", "value": "ICAB0203-001" },
+*        { "trait_type": "Student", "value": "본인 이름" },
+*        { "trait_type": "Semester", "value": "2026 Spring" }
+*    ]
+* }
+*/
