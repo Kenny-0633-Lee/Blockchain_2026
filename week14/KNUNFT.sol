@@ -41,7 +41,7 @@ contract KNUNFT is ERC721URIStorage, Ownable {
      *   to      = 0x내주소
      *   tokenURI = "https://gateway.pinata.cloud/ipfs/[CID]"
      */
-    function mint(address to, string memory tokenURI)
+    function mintNFT(address to, string memory tokenURI)
         public
         onlyOwner
         returns (uint256)
