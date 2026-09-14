@@ -46,7 +46,7 @@
             background-color: var(--bg-main);
             color: var(--text-main);
             line-height: 1.6;
-            padding: 30px;
+            padding: 20px 16px;
         }
 
         .container {
@@ -58,36 +58,32 @@
         .header-card {
             background: linear-gradient(135deg, #1e3a8a 0%, #3b82f6 100%);
             color: #ffffff;
-            padding: 32px;
+            padding: 24px 20px;
             border-radius: 16px;
             box-shadow: 0 10px 25px -5px rgba(30, 58, 138, 0.25);
-            margin-bottom: 28px;
+            margin-bottom: 20px;
         }
 
         .header-title {
-            font-size: 26px;
+            font-size: 22px;
             font-weight: 800;
-            margin-bottom: 8px;
+            margin-bottom: 6px;
             letter-spacing: -0.5px;
         }
 
         .header-subtitle {
-            font-size: 14px;
+            font-size: 13px;
             opacity: 0.9;
             font-weight: 400;
         }
 
         .meta-grid {
-            margin-top: 20px;
-            padding-top: 20px;
+            margin-top: 16px;
+            padding-top: 16px;
             border-top: 1px solid rgba(255, 255, 255, 0.2);
-            display: flex;
-            justify-content: space-between;
-            width: 100%;
-        }
-
-        .meta-item {
-            flex: 1;
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 12px;
         }
 
         .meta-label {
@@ -98,7 +94,7 @@
         }
 
         .meta-value {
-            font-size: 15px;
+            font-size: 13.5px;
             font-weight: 700;
             margin-top: 2px;
         }
@@ -106,32 +102,26 @@
         /* Navigation Tabs */
         .nav-tabs {
             display: flex;
-            gap: 8px;
-            margin-bottom: 24px;
+            gap: 6px;
+            margin-bottom: 20px;
             border-bottom: 2px solid var(--border-color);
-            padding-bottom: 2px;
+            padding-bottom: 4px;
             overflow-x: auto;
+            -webkit-overflow-scrolling: touch;
         }
 
         .tab-btn {
-            padding: 12px 20px;
-            font-size: 15px;
+            padding: 10px 14px;
+            font-size: 13.5px;
             font-weight: 700;
             border: none;
             background: transparent;
             color: var(--text-muted);
             cursor: pointer;
-            border-radius: 10px 10px 0 0;
+            border-radius: 8px 8px 0 0;
             transition: all 0.2s ease;
-            display: flex;
-            align-items: center;
-            gap: 6px;
             white-space: nowrap;
-        }
-
-        .tab-btn:hover {
-            background-color: #f1f5f9;
-            color: var(--text-main);
+            flex-shrink: 0;
         }
 
         .tab-btn.active {
@@ -156,30 +146,29 @@
         /* Role Summary Card */
         .role-summary-card {
             background: #ffffff;
-            border-radius: 16px;
+            border-radius: 14px;
             border: 1px solid var(--border-color);
-            padding: 20px 24px;
-            margin-bottom: 28px;
+            padding: 16px 18px;
+            margin-bottom: 20px;
             box-shadow: 0 4px 12px rgba(0, 0, 0, 0.03);
         }
 
         .role-summary-title {
-            font-size: 15px;
+            font-size: 14px;
             font-weight: 700;
             color: var(--primary);
-            margin-bottom: 14px;
+            margin-bottom: 12px;
         }
 
         .role-grid {
-            display: flex;
-            gap: 12px;
-            width: 100%;
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 8px;
         }
 
         .role-box {
-            flex: 1;
-            padding: 12px;
-            border-radius: 10px;
+            padding: 10px 8px;
+            border-radius: 8px;
             text-align: center;
         }
 
@@ -187,53 +176,41 @@
         .role-box-mom { background-color: var(--mom-bg); color: var(--mom-color); }
         .role-box-son { background-color: var(--son-bg); color: var(--son-color); }
         .role-box-daughter { background-color: var(--daughter-bg); color: var(--daughter-color); }
-        .role-box-all { background-color: var(--all-bg); color: var(--all-color); }
+        .role-box-all { background-color: var(--all-bg); color: var(--all-color); grid-column: span 2; }
 
-        .role-box-name { font-size: 14px; font-weight: 800; }
-        .role-box-task { font-size: 12px; margin-top: 4px; font-weight: 600; }
+        .role-box-name { font-size: 13px; font-weight: 800; }
+        .role-box-task { font-size: 11.5px; margin-top: 2px; font-weight: 600; }
 
         /* Schedule Timeline */
         .day-section {
             background: var(--card-bg);
-            border-radius: 16px;
+            border-radius: 14px;
             border: 1px solid var(--border-color);
             box-shadow: 0 4px 12px rgba(0, 0, 0, 0.03);
-            margin-bottom: 24px;
+            margin-bottom: 20px;
             overflow: hidden;
         }
 
         .day-header {
-            padding: 16px 24px;
+            padding: 14px 18px;
             display: flex;
-            justify-content: space-between;
-            align-items: center;
+            flex-direction: column;
+            gap: 4px;
             border-bottom: 1px solid var(--border-color);
         }
 
-        .day-header.day-1 {
-            background-color: var(--day1-bg);
-            border-left: 6px solid var(--day1-color);
-        }
-
-        .day-header.day-2 {
-            background-color: var(--day2-bg);
-            border-left: 6px solid var(--day2-color);
-        }
-
-        .day-header.day-3 {
-            background-color: var(--day3-bg);
-            border-left: 6px solid var(--day3-color);
-        }
+        .day-header.day-1 { background-color: var(--day1-bg); border-left: 5px solid var(--day1-color); }
+        .day-header.day-2 { background-color: var(--day2-bg); border-left: 5px solid var(--day2-color); }
+        .day-header.day-3 { background-color: var(--day3-bg); border-left: 5px solid var(--day3-color); }
 
         .day-badge {
             display: inline-block;
-            font-size: 12px;
+            font-size: 11px;
             font-weight: 800;
-            padding: 3px 10px;
-            border-radius: 20px;
+            padding: 2px 8px;
+            border-radius: 12px;
             color: #ffffff;
-            margin-right: 8px;
-            vertical-align: middle;
+            margin-right: 6px;
         }
 
         .day-1 .day-badge { background-color: var(--day1-color); }
@@ -241,72 +218,65 @@
         .day-3 .day-badge { background-color: var(--day3-color); }
 
         .day-title {
-            display: inline-block;
-            font-size: 18px;
+            font-size: 16px;
             font-weight: 700;
             color: var(--text-main);
-            vertical-align: middle;
         }
 
         .day-focus {
-            font-size: 13px;
+            font-size: 12px;
             color: var(--text-muted);
             font-weight: 500;
         }
 
-        /* Content Table */
-        .plan-table {
-            width: 100%;
-            border-collapse: collapse;
+        /* Responsive Mobile Task Cards (replaces table on mobile) */
+        .plan-cards {
+            display: flex;
+            flex-direction: column;
         }
 
-        .plan-table th {
-            background-color: #f8fafc;
-            color: var(--text-muted);
-            font-size: 12px;
-            font-weight: 700;
-            text-align: left;
-            padding: 12px 20px;
+        .plan-card-item {
+            padding: 16px;
             border-bottom: 1px solid var(--border-color);
-            text-transform: uppercase;
         }
 
-        .plan-table td {
-            padding: 18px 20px;
-            border-bottom: 1px solid var(--border-color);
-            vertical-align: top;
-            font-size: 13.5px;
-        }
-
-        .plan-table tr:last-child td {
+        .plan-card-item:last-child {
             border-bottom: none;
         }
 
-        .time-badge {
-            display: inline-block;
-            padding: 4px 10px;
-            border-radius: 6px;
-            font-size: 12px;
-            font-weight: 700;
-            background-color: #f1f5f9;
-            color: #475569;
+        .plan-card-header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            margin-bottom: 10px;
         }
 
         .zone-name {
             font-weight: 700;
             font-size: 15px;
             color: var(--primary);
-            margin-bottom: 4px;
+        }
+
+        .time-badge {
+            display: inline-block;
+            padding: 3px 8px;
+            border-radius: 6px;
+            font-size: 11px;
+            font-weight: 700;
+            background-color: #f1f5f9;
+            color: #475569;
         }
 
         .role-list {
             list-style: none;
+            margin-bottom: 12px;
         }
 
         .role-item {
             position: relative;
-            padding-left: 75px;
-            margin-bottom: 10px;
+            padding-left: 80px;
+            margin-bottom: 8px;
+            font-size: 13px;
         }
 
         .role-item:last-child {
@@ -316,10 +286,10 @@
         .person-tag {
             position: absolute;
             left: 0;
-            top: 2px;
-            font-size: 11px;
+            top: 1px;
+            font-size: 10.5px;
             font-weight: 700;
-            padding: 2px 8px;
+            padding: 2px 6px;
             border-radius: 4px;
         }
 
@@ -333,35 +303,27 @@
             background-color: #fffbeb;
             border: 1px solid #fef3c7;
             border-radius: 8px;
-            padding: 12px 14px;
+            padding: 10px 12px;
         }
 
         .tip-title {
             font-weight: 700;
-            font-size: 12px;
+            font-size: 11.5px;
             color: var(--accent);
-            margin-bottom: 4px;
+            margin-bottom: 3px;
         }
 
         .tip-content {
-            font-size: 12.5px;
+            font-size: 12px;
             color: #92400e;
-            line-height: 1.5;
+            line-height: 1.45;
         }
 
-        .tip-content p {
-            margin-bottom: 4px;
-        }
-
-        .tip-content p:last-child {
-            margin-bottom: 0;
-        }
-
-        /* Checkable Task Card Styling for Individual Tabs */
+        /* Individual Checklists */
         .person-header-box {
-            padding: 20px 24px;
+            padding: 16px 18px;
             border-radius: 12px;
-            margin-bottom: 24px;
+            margin-bottom: 16px;
             display: flex;
             align-items: center;
             justify-content: space-between;
@@ -373,7 +335,7 @@
         .person-header-box.daughter { background-color: var(--daughter-bg); border: 1px solid #ddd6fe; }
 
         .person-title-text {
-            font-size: 18px;
+            font-size: 16px;
             font-weight: 800;
         }
 
@@ -383,33 +345,28 @@
         .person-header-box.daughter .person-title-text { color: var(--daughter-color); }
 
         .progress-badge {
-            font-size: 13px;
+            font-size: 12px;
             font-weight: 700;
             background: #ffffff;
-            padding: 4px 12px;
-            border-radius: 20px;
-            box-shadow: 0 2px 4px rgba(0,0,0,0.05);
+            padding: 4px 10px;
+            border-radius: 16px;
         }
 
         .task-group {
             background: #ffffff;
-            border-radius: 14px;
+            border-radius: 12px;
             border: 1px solid var(--border-color);
-            box-shadow: 0 4px 12px rgba(0,0,0,0.03);
-            margin-bottom: 20px;
+            margin-bottom: 16px;
             overflow: hidden;
         }
 
         .task-group-title {
-            padding: 14px 20px;
+            padding: 12px 16px;
             background-color: #f8fafc;
             border-bottom: 1px solid var(--border-color);
-            font-size: 15px;
+            font-size: 13.5px;
             font-weight: 700;
             color: var(--text-main);
-            display: flex;
-            align-items: center;
-            gap: 8px;
         }
 
         .task-list {
@@ -417,30 +374,25 @@
         }
 
         .task-item {
-            padding: 16px 20px;
+            padding: 14px 16px;
             border-bottom: 1px solid var(--border-color);
             display: flex;
             align-items: flex-start;
-            gap: 16px;
-            transition: background 0.15s ease;
+            gap: 12px;
         }
 
         .task-item:last-child {
             border-bottom: none;
         }
 
-        .task-item:hover {
-            background-color: #f8fafc;
-        }
-
         /* Toggle Switch Styling */
         .switch-container {
             position: relative;
             display: inline-block;
-            width: 48px;
-            height: 26px;
+            width: 44px;
+            height: 24px;
             flex-shrink: 0;
-            margin-top: 2px;
+            margin-top: 1px;
         }
 
         .switch-container input {
@@ -452,10 +404,7 @@
         .slider {
             position: absolute;
             cursor: pointer;
-            top: 0;
-            left: 0;
-            right: 0;
-            bottom: 0;
+            top: 0; left: 0; right: 0; bottom: 0;
             background-color: #cbd5e1;
             transition: .3s;
             border-radius: 34px;
@@ -464,14 +413,13 @@
         .slider:before {
             position: absolute;
             content: "";
-            height: 18px;
-            width: 18px;
+            height: 16px;
+            width: 16px;
             left: 4px;
             bottom: 4px;
             background-color: white;
             transition: .3s;
             border-radius: 50%;
-            box-shadow: 0 2px 4px rgba(0,0,0,0.2);
         }
 
         input:checked + .slider {
@@ -479,7 +427,7 @@
         }
 
         input:checked + .slider:before {
-            transform: translateX(22px);
+            transform: translateX(20px);
         }
 
         .task-details {
@@ -487,30 +435,28 @@
         }
 
         .task-name {
-            font-size: 14.5px;
+            font-size: 13.5px;
             font-weight: 700;
             color: var(--text-main);
-            margin-bottom: 4px;
-            transition: color 0.2s;
+            margin-bottom: 3px;
         }
 
         .task-desc {
-            font-size: 13px;
+            font-size: 12px;
             color: var(--text-muted);
-            line-height: 1.5;
+            line-height: 1.45;
         }
 
         .task-tip {
-            font-size: 12px;
+            font-size: 11px;
             color: #d97706;
             background: #fffbeb;
-            padding: 4px 8px;
+            padding: 3px 6px;
             border-radius: 4px;
             display: inline-block;
-            margin-top: 6px;
+            margin-top: 4px;
         }
 
-        /* Completed Task Style */
         .task-item.completed {
             background-color: #f1f5f9;
         }
@@ -524,40 +470,64 @@
             color: #cbd5e1;
         }
 
-        /* Essential Notice Card */
+        /* Notice Card */
         .notice-card {
             background-color: #ffffff;
             border-radius: 12px;
             border: 1px solid var(--border-color);
-            padding: 20px 24px;
-            margin-top: 28px;
+            padding: 16px 18px;
+            margin-top: 20px;
         }
 
         .notice-title {
-            font-size: 15px;
+            font-size: 14px;
             font-weight: 700;
             color: var(--primary);
-            margin-bottom: 10px;
+            margin-bottom: 8px;
         }
 
         .notice-grid {
             display: flex;
-            gap: 20px;
-            width: 100%;
-        }
-
-        .notice-col {
-            flex: 1;
+            flex-direction: column;
+            gap: 8px;
         }
 
         .notice-list {
-            padding-left: 18px;
-            font-size: 13px;
+            padding-left: 16px;
+            font-size: 12px;
             color: var(--text-muted);
         }
 
         .notice-list li {
-            margin-bottom: 6px;
+            margin-bottom: 4px;
+        }
+
+        /* Desktop Media Query (PC 화면 확장 적용) */
+        @media (min-width: 768px) {
+            body { padding: 30px; }
+            .header-card { padding: 32px; margin-bottom: 28px; }
+            .header-title { font-size: 26px; }
+            .header-subtitle { font-size: 14px; }
+            .meta-grid { grid-template-columns: repeat(4, 1fr); margin-top: 20px; padding-top: 20px; }
+            .meta-value { font-size: 15px; }
+
+            .role-grid { grid-template-columns: repeat(5, 1fr); }
+            .role-box-all { grid-column: span 1; }
+
+            .day-header { flex-direction: row; justify-content: space-between; align-items: center; padding: 16px 24px; }
+            .day-title { font-size: 18px; }
+            .day-focus { font-size: 13px; }
+
+            /* Desktop Table view (hide mobile cards) */
+            .plan-cards { display: none; }
+            .plan-table { display: table; }
+
+            .notice-grid { flex-direction: row; }
+        }
+
+        /* Mobile View (Hide desktop table) */
+        @media (max-width: 767px) {
+            .plan-table { display: none; }
         }
     </style>
 </head>
@@ -567,13 +537,13 @@
 
     <!-- Title Section -->
     <div class="header-card">
-        <div class="header-title">가족 4인 체제 3일 집안 대청소 마스터 플랜</div>
-        <div class="header-subtitle">맞춤형 역할 분담 (아빠·엄마·아들·딸) & 개인별 실행 체크리스트</div>
+        <div class="header-title">가족 4인 체제 3일 대청소 플랜</div>
+        <div class="header-subtitle">맞춤형 역할 분담 (아빠·엄마·아들·딸) & 모바일 체크리스트</div>
         
         <div class="meta-grid">
             <div class="meta-item">
                 <div class="meta-label">참여 구성원</div>
-                <div class="meta-value">가족 4명 (아빠/엄마/아들/딸)</div>
+                <div class="meta-value">가족 4명</div>
             </div>
             <div class="meta-item">
                 <div class="meta-label">예상 기간</div>
@@ -581,45 +551,44 @@
             </div>
             <div class="meta-item">
                 <div class="meta-label">대상 공간</div>
-                <div class="meta-value">거실 / 방3 / 욕실2 / 주방</div>
+                <div class="meta-value">거실/방3/욕실2/주방</div>
             </div>
             <div class="meta-item">
                 <div class="meta-label">운영 원칙</div>
-                <div class="meta-value">개별 담당 구역 + 체크리스트 실행</div>
+                <div class="meta-value">전담 구역 + 체크리스트</div>
             </div>
         </div>
     </div>
 
     <!-- Navigation Tabs -->
     <div class="nav-tabs">
-        <button class="tab-btn active" onclick="openTab(event, 'tab-total')">📋 전체 일체형 계획표</button>
-        <button class="tab-btn tab-dad" onclick="openTab(event, 'tab-dad')">👨‍👧‍👦 아빠 전담 체크리스트</button>
-        <button class="tab-btn tab-mom" onclick="openTab(event, 'tab-mom')">👩‍🍳 엄마 전담 체크리스트</button>
-        <button class="tab-btn tab-son" onclick="openTab(event, 'tab-son')">🧑‍💻 아들 전담 체크리스트</button>
-        <button class="tab-btn tab-daughter" onclick="openTab(event, 'tab-daughter')">👩‍🎨 딸 전담 체크리스트</button>
+        <button class="tab-btn active" onclick="openTab(event, 'tab-total')">📋 전체 계획표</button>
+        <button class="tab-btn tab-dad" onclick="openTab(event, 'tab-dad')">👨‍👧‍👦 아빠 체크리스트</button>
+        <button class="tab-btn tab-mom" onclick="openTab(event, 'tab-mom')">👩‍🍳 엄마 체크리스트</button>
+        <button class="tab-btn tab-son" onclick="openTab(event, 'tab-son')">🧑‍💻 아들 체크리스트</button>
+        <button class="tab-btn tab-daughter" onclick="openTab(event, 'tab-daughter')">👩‍🎨 딸 체크리스트</button>
     </div>
 
     <!-- TAB 0: TOTAL PLAN -->
     <div id="tab-total" class="tab-content active">
-        <!-- Role Summary Box -->
         <div class="role-summary-card">
-            <div class="role-summary-title">👤 가족별 전담 지정 구역 현황</div>
+            <div class="role-summary-title">👤 가족별 전담 지정 구역</div>
             <div class="role-grid">
                 <div class="role-box role-box-dad">
                     <div class="role-box-name">아빠</div>
-                    <div class="role-box-task">화장실 2곳 전담</div>
+                    <div class="role-box-task">화장실 2곳</div>
                 </div>
                 <div class="role-box role-box-mom">
                     <div class="role-box-name">엄마</div>
-                    <div class="role-box-task">안방(방1) & 주방 전담</div>
+                    <div class="role-box-task">안방 & 주방</div>
                 </div>
                 <div class="role-box role-box-son">
                     <div class="role-box-name">아들</div>
-                    <div class="role-box-task">아들방(방2) 전담</div>
+                    <div class="role-box-task">아들방전담</div>
                 </div>
                 <div class="role-box role-box-daughter">
                     <div class="role-box-name">딸</div>
-                    <div class="role-box-task">딸방(방3) 전담</div>
+                    <div class="role-box-task">딸방전담</div>
                 </div>
                 <div class="role-box role-box-all">
                     <div class="role-box-name">공동 작업</div>
@@ -633,78 +602,61 @@
             <div class="day-header day-1">
                 <div>
                     <span class="day-badge">DAY 1</span>
-                    <span class="day-title">전담 구역 집중 케어 (주방 & 화장실)</span>
+                    <span class="day-title">전담 구역 케어 (주방 & 화장실)</span>
                 </div>
-                <div class="day-focus">핵심: 물때, 기름때, 묵은 곰팡이 제거 및 주방 정리</div>
+                <div class="day-focus">핵심: 물때, 기름때, 묵은 곰팡이 제거</div>
             </div>
-            <table class="plan-table">
-                <thead>
-                    <tr>
-                        <th style="width: 10%;">시간</th>
-                        <th style="width: 18%;">청소 구역</th>
-                        <th style="width: 42%;">담당자 및 상세 작업</th>
-                        <th style="width: 30%;">세부 노하우 & 팁</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    <tr>
-                        <td><span class="time-badge">오전</span></td>
-                        <td>
-                            <div class="zone-name">주방 전체</div>
-                            <div style="font-size:12px; color:#64748b;">상/하부장 & 가전</div>
-                        </td>
-                        <td>
-                            <div class="role-list">
-                                <div class="role-item">
-                                    <span class="person-tag tag-mom">엄마 (전담)</span>
-                                    상/하부장 선반 비우기, 냉장고 유통기한 정리 및 내·외부 닦기
-                                </div>
-                                <div class="role-item">
-                                    <span class="person-tag tag-all">가족 공동</span>
-                                    주방 후드 필터 탈거 세척, 가스레인지/인덕션 기름때 불림 및 닦기 지원
-                                </div>
-                            </div>
-                        </td>
-                        <td>
-                            <div class="tip-box">
-                                <div class="tip-title">💡 주방 세척 팁</div>
-                                <div class="tip-content">
-                                    <p>• <b>후드 필터:</b> 뜨거운 물 + 과탄산소다 푼 물에 20분간 침지 후 세척</p>
-                                    <p>• <b>기름때:</b> 과탄산소다 반죽을 바르고 불린 후 닦아내기</p>
-                                </div>
-                            </div>
-                        </td>
-                    </tr>
-                    <tr>
-                        <td><span class="time-badge">오후</span></td>
-                        <td>
-                            <div class="zone-name">화장실 2곳</div>
-                            <div style="font-size:12px; color:#64748b;">안방 및 거실 욕실</div>
-                        </td>
-                        <td>
-                            <div class="role-list">
-                                <div class="role-item">
-                                    <span class="person-tag tag-dad">아빠 (전담)</span>
-                                    화장실 A(안방) & B(거실) 집중 세척: 환기구 디퓨저 탈거, 타일 줄눈, 변기, 세면대, 샤워부스 물때 제거
-                                </div>
-                                <div class="role-item">
-                                    <span class="person-tag tag-all">가족 지원</span>
-                                    욕실 내 수건/용품 배출 및 세척 후 도구 건조 보조
-                                </div>
-                            </div>
-                        </td>
-                        <td>
-                            <div class="tip-box">
-                                <div class="tip-title">💡 욕실 세척 팁</div>
-                                <div class="tip-content">
-                                    <p>• <b>줄눈 곰팡이:</b> 락스 푼 물을 휴지에 적셔 줄눈에 붙인 뒤 30분 후 씻어내기</p>
-                                    <p>• <b>수전/거울:</b> 치약이나 구연산수로 닦으면 물때 완벽 제거</p>
-                                </div>
-                            </div>
-                        </td>
-                    </tr>
-                </tbody>
-            </table>
+
+            <!-- Mobile Card View -->
+            <div class="plan-cards">
+                <div class="plan-card-item">
+                    <div class="plan-card-header">
+                        <div class="zone-name">주방 전체</div>
+                        <span class="time-badge">오전</span>
+                    </div>
+                    <div class="role-list">
+                        <div class="role-item">
+                            <span class="person-tag tag-mom">엄마 (전담)</span>
+                            상/하부장 선반 비우기, 냉장고 유통기한 정리 및 닦기
+                        </div>
+                        <div class="role-item">
+                            <span class="person-tag tag-all">가족 공동</span>
+                            후드 필터 탈거 세척, 가스레인지/인덕션 기름때 제거 지원
+                        </div>
+                    </div>
+                    <div class="tip-box">
+                        <div class="tip-title">💡 주방 세척 팁</div>
+                        <div class="tip-content">
+                            • <b>후드 필터:</b> 뜨거운 물 + 과탄산소다 20분 침지 후 세척<br>
+                            • <b>기름때:</b> 과탄산소다 반죽을 바르고 불린 후 닦아내기
+                        </div>
+                    </div>
+                </div>
+
+                <div class="plan-card-item">
+                    <div class="plan-card-header">
+                        <div class="zone-name">화장실 2곳</div>
+                        <span class="time-badge">오후</span>
+                    </div>
+                    <div class="role-list">
+                        <div class="role-item">
+                            <span class="person-tag tag-dad">아빠 (전담)</span>
+                            안방/거실 화장실 집중 세척: 환기구 디퓨저 탈거, 줄눈, 변기, 세면대, 물때 제거
+                        </div>
+                        <div class="role-item">
+                            <span class="person-tag tag-all">가족 지원</span>
+                            욕실 용품 배출 및 세척 후 도구 건조 보조
+                        </div>
+                    </div>
+                    <div class="tip-box">
+                        <div class="tip-title">💡 욕실 세척 팁</div>
+                        <div class="tip-content">
+                            • <b>줄눈 곰팡이:</b> 락스 희석액을 휴지에 적셔 줄눈 30분 후 세척<br>
+                            • <b>수전/거울:</b> 치약이나 구연산수로 물때 제거
+                        </div>
+                    </div>
+                </div>
+            </div>
         </div>
 
         <!-- DAY 2 -->
@@ -712,86 +664,68 @@
             <div class="day-header day-2">
                 <div>
                     <span class="day-badge">DAY 2</span>
-                    <span class="day-title">각자 담당 방 정돈 & 거실·베란다 공동 청소</span>
+                    <span class="day-title">개별 방 정돈 & 거실·베란다</span>
                 </div>
-                <div class="day-focus">핵심: 개인 공간 정돈 및 공용 공간 먼지 털기/물청소</div>
+                <div class="day-focus">핵심: 개인 공간 정돈 및 먼지 털기/물청소</div>
             </div>
-            <table class="plan-table">
-                <thead>
-                    <tr>
-                        <th style="width: 10%;">시간</th>
-                        <th style="width: 18%;">청소 구역</th>
-                        <th style="width: 42%;">담당자 및 상세 작업</th>
-                        <th style="width: 30%;">세부 노하우 & 팁</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    <tr>
-                        <td><span class="time-badge">오전</span></td>
-                        <td>
-                            <div class="zone-name">개별 방 3개</div>
-                            <div style="font-size:12px; color:#64748b;">안방 / 아들방 / 딸방</div>
-                        </td>
-                        <td>
-                            <div class="role-list">
-                                <div class="role-item">
-                                    <span class="person-tag tag-mom">엄마</span>
-                                    <b>안방 전담:</b> 창틀·가구 상단 먼지 털기, 침구류 세탁 배출
-                                </div>
-                                <div class="role-item">
-                                    <span class="person-tag tag-son">아들</span>
-                                    <b>아들방 전담:</b> 창틀 닦기, 책상/책장 먼지 집진, 침구 정리 및 옷 정돈
-                                </div>
-                                <div class="role-item">
-                                    <span class="person-tag tag-daughter">딸</span>
-                                    <b>딸방 전담:</b> 창틀 닦기, 화장대/책상 먼지 집진, 침구 정리 및 옷 정돈
-                                </div>
-                                <div class="role-item">
-                                    <span class="person-tag tag-dad">아빠</span>
-                                    각 방 무거운 가구 이동 보조 및 높이 있는 가구 상단 먼지 제거 지원
-                                </div>
-                            </div>
-                        </td>
-                        <td>
-                            <div class="tip-box">
-                                <div class="tip-title">💡 먼지제거 & 창틀 팁</div>
-                                <div class="tip-content">
-                                    <p>• <b>창틀 먼지:</b> 물에 적신 신문지나 쌀뜨물을 창틀에 넣고 나무젓가락으로 닦기</p>
-                                    <p>• <b>책상/가구:</b> 정전기 청소포로 1차 집진 후 물걸레질</p>
-                                </div>
-                            </div>
-                        </td>
-                    </tr>
-                    <tr>
-                        <td><span class="time-badge">오후</span></td>
-                        <td>
-                            <div class="zone-name">거실 & 베란다</div>
-                            <div style="font-size:12px; color:#64748b;">공용 공간 & 다용도실</div>
-                        </td>
-                        <td>
-                            <div class="role-list">
-                                <div class="role-item">
-                                    <span class="person-tag tag-dad">아빠 & 아들</span>
-                                    베란다/다용도실 짐 이동, 창틀 및 바닥 물청소, 배수구 소독
-                                </div>
-                                <div class="role-item">
-                                    <span class="person-tag tag-mom">엄마 & 딸</span>
-                                    거실 소파/TV장/가전 뒤편 먼지 청소, 유리창 안쪽 닦기
-                                </div>
-                            </div>
-                        </td>
-                        <td>
-                            <div class="tip-box">
-                                <div class="tip-title">💡 틈새 청소 팁</div>
-                                <div class="tip-content">
-                                    <p>• <b>소파/가전 뒤:</b> 헌 스타킹을 옷걸이에 끼워 묵은 먼지 훔치기</p>
-                                    <p>• <b>배수구 악취:</b> 베이킹소다+뜨거운 물을 부어 소독 및 악취 제거</p>
-                                </div>
-                            </div>
-                        </td>
-                    </tr>
-                </tbody>
-            </table>
+
+            <div class="plan-cards">
+                <div class="plan-card-item">
+                    <div class="plan-card-header">
+                        <div class="zone-name">개별 방 3개</div>
+                        <span class="time-badge">오전</span>
+                    </div>
+                    <div class="role-list">
+                        <div class="role-item">
+                            <span class="person-tag tag-mom">엄마</span>
+                            <b>안방 전담:</b> 창틀·가구 상단 먼지, 침구 세탁 배출
+                        </div>
+                        <div class="role-item">
+                            <span class="person-tag tag-son">아들</span>
+                            <b>아들방 전담:</b> 창틀, 책상/책장 먼지, 옷 정돈
+                        </div>
+                        <div class="role-item">
+                            <span class="person-tag tag-daughter">딸</span>
+                            <b>딸방 전담:</b> 창틀, 화장대/책상 먼지, 옷 정돈
+                        </div>
+                        <div class="role-item">
+                            <span class="person-tag tag-dad">아빠</span>
+                            무거운 가구 이동 보조 및 높은 가구 먼지 지원
+                        </div>
+                    </div>
+                    <div class="tip-box">
+                        <div class="tip-title">💡 먼지제거 & 창틀 팁</div>
+                        <div class="tip-content">
+                            • <b>창틀:</b> 적신 신문지를 창틀에 넣고 나무젓가락으로 닦기<br>
+                            • <b>가구:</b> 정전기 청소포로 1차 집진 후 물걸레질
+                        </div>
+                    </div>
+                </div>
+
+                <div class="plan-card-item">
+                    <div class="plan-card-header">
+                        <div class="zone-name">거실 & 베란다</div>
+                        <span class="time-badge">오후</span>
+                    </div>
+                    <div class="role-list">
+                        <div class="role-item">
+                            <span class="person-tag tag-dad">아빠 & 아들</span>
+                            베란다 짐 이동, 창틀 및 바닥 물청소, 배수구 소독
+                        </div>
+                        <div class="role-item">
+                            <span class="person-tag tag-mom">엄마 & 딸</span>
+                            거실 소파/TV장 뒤 먼지 청소, 유리창 안쪽 닦기
+                        </div>
+                    </div>
+                    <div class="tip-box">
+                        <div class="tip-title">💡 틈새 청소 팁</div>
+                        <div class="tip-content">
+                            • <b>소파/가전 뒤:</b> 헌 스타킹을 옷걸이에 끼워 묵은 먼지 훔치기<br>
+                            • <b>배수구:</b> 베이킹소다+뜨거운 물로 악취 제거
+                        </div>
+                    </div>
+                </div>
+            </div>
         </div>
 
         <!-- DAY 3 -->
@@ -799,86 +733,68 @@
             <div class="day-header day-3">
                 <div>
                     <span class="day-badge">DAY 3</span>
-                    <span class="day-title">전체 바닥 딥클리닝 & 최종 쓰레기 배출</span>
+                    <span class="day-title">전체 바닥 딥클리닝 & 배출</span>
                 </div>
-                <div class="day-focus">핵심: 집안 전체 바닥 습식/스팀 청소 및 쓰레기 배출</div>
+                <div class="day-focus">핵심: 전체 바닥 습식/스팀 청소 및 쓰레기 배출</div>
             </div>
-            <table class="plan-table">
-                <thead>
-                    <tr>
-                        <th style="width: 10%;">시간</th>
-                        <th style="width: 18%;">청소 구역</th>
-                        <th style="width: 42%;">담당자 및 상세 작업</th>
-                        <th style="width: 30%;">세부 노하우 & 팁</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    <tr>
-                        <td><span class="time-badge">오전</span></td>
-                        <td>
-                            <div class="zone-name">전체 바닥</div>
-                            <div style="font-size:12px; color:#64748b;">거실 / 방 3 / 주방</div>
-                        </td>
-                        <td>
-                            <div class="role-list">
-                                <div class="role-item">
-                                    <span class="person-tag tag-son">아들 & 딸</span>
-                                    집안 전체 진공청소기 청소 (틈새/모서리 전용 노즐 활용)
-                                </div>
-                                <div class="role-item">
-                                    <span class="person-tag tag-dad">아빠 & 엄마</span>
-                                    스팀/습식 물걸레로 집안 전체 바닥 2회 이상 딥클리닝
-                                </div>
-                            </div>
-                        </td>
-                        <td>
-                            <div class="tip-box">
-                                <div class="tip-title">💡 바닥 클리닝 팁</div>
-                                <div class="tip-content">
-                                    <p>• <b>바닥 끈적임:</b> 식초를 약간 섞은 물로 걸레질하여 유분과 잡내 제거</p>
-                                    <p>• <b>강마루/원목:</b> 습기 손상 방지를 위해 물기를 바짝 짜낸 걸레만 사용</p>
-                                </div>
-                            </div>
-                        </td>
-                    </tr>
-                    <tr>
-                        <td><span class="time-badge">오후</span></td>
-                        <td>
-                            <div class="zone-name">마무리 & 배출</div>
-                            <div style="font-size:12px; color:#64748b;">전 구역 최종 점검</div>
-                        </td>
-                        <td>
-                            <div class="role-list">
-                                <div class="role-item">
-                                    <span class="person-tag tag-all">가족 전원</span>
-                                    종량제 봉투 배출, 재활용 분리수거, 청소 도구 세척 및 건조
-                                </div>
-                            </div>
-                        </td>
-                        <td>
-                            <div class="tip-box">
-                                <div class="tip-title">💡 최종 마무리 팁</div>
-                                <div class="tip-content">
-                                    <p>• <b>전체 환기:</b> 청소 종료 후 2시간 이상 전체 창문을 열어 냄새/습기 배출</p>
-                                    <p>• <b>도구 건조:</b> 걸레 및 청소 솔은 바짝 말려 세균 번식 방지</p>
-                                </div>
-                            </div>
-                        </td>
-                    </tr>
-                </tbody>
-            </table>
+
+            <div class="plan-cards">
+                <div class="plan-card-item">
+                    <div class="plan-card-header">
+                        <div class="zone-name">전체 바닥</div>
+                        <span class="time-badge">오전</span>
+                    </div>
+                    <div class="role-list">
+                        <div class="role-item">
+                            <span class="person-tag tag-son">아들 & 딸</span>
+                            집안 전체 진공청소기 청소 (구석 노즐 사용)
+                        </div>
+                        <div class="role-item">
+                            <span class="person-tag tag-dad">아빠 & 엄마</span>
+                            스팀/습식 물걸레로 전체 바닥 2회 이상 딥클리닝
+                        </div>
+                    </div>
+                    <div class="tip-box">
+                        <div class="tip-title">💡 바닥 클리닝 팁</div>
+                        <div class="tip-content">
+                            • <b>바닥 끈적임:</b> 식초 약간 섞은 물로 걸레질하여 유분 제거<br>
+                            • <b>마루:</b> 손상 방지를 위해 바짝 짜낸 걸레만 사용
+                        </div>
+                    </div>
+                </div>
+
+                <div class="plan-card-item">
+                    <div class="plan-card-header">
+                        <div class="zone-name">마무리 & 배출</div>
+                        <span class="time-badge">오후</span>
+                    </div>
+                    <div class="role-list">
+                        <div class="role-item">
+                            <span class="person-tag tag-all">가족 전원</span>
+                            종량제 배출, 재활용 분리수거, 청소 도구 세척 및 건조
+                        </div>
+                    </div>
+                    <div class="tip-box">
+                        <div class="tip-title">💡 최종 마무리 팁</div>
+                        <div class="tip-content">
+                            • <b>전체 환기:</b> 청소 종료 후 2시간 이상 전체 창문 열기<br>
+                            • <b>도구 건조:</b> 걸레 및 솔 바짝 말려 세균 번식 방지
+                        </div>
+                    </div>
+                </div>
+            </div>
         </div>
     </div>
 
     <!-- TAB 1: DAD -->
     <div id="tab-dad" class="tab-content">
         <div class="person-header-box dad">
-            <div class="person-title-text">👨‍👧‍👦 아빠의 전담 테스크 체크리스트</div>
-            <div class="progress-badge">완료 현황: <span id="dad-progress">0 / 7</span></div>
+            <div class="person-title-text">👨‍👧‍👦 아빠 테스크</div>
+            <div class="progress-badge"><span id="dad-progress">0 / 7</span></div>
         </div>
 
         <div class="task-group">
-            <div class="task-group-title">📅 1일차 [오후]: 화장실 2곳 집중 청소 (전담)</div>
+            <div class="task-group-title">📅 1일차 [오후]: 화장실 2곳 집중 청소</div>
             <ul class="task-list">
                 <li class="task-item">
                     <label class="switch-container">
@@ -886,8 +802,8 @@
                         <span class="slider"></span>
                     </label>
                     <div class="task-details">
-                        <div class="task-name">안방 및 거실 화장실 환기구 디퓨저 탈거 세척</div>
-                        <div class="task-desc">환기구 커버를 떼어내 내부 먼지 털어내고 물세척 후 건조하기</div>
+                        <div class="task-name">화장실 환기구 디퓨저 탈거 세척</div>
+                        <div class="task-desc">커버 떼어내 내부 먼지 털어내고 세척 후 건조</div>
                     </div>
                 </li>
                 <li class="task-item">
@@ -897,8 +813,8 @@
                     </label>
                     <div class="task-details">
                         <div class="task-name">타일 줄눈 묵은때 및 곰팡이 제거</div>
-                        <div class="task-desc">락스를 희석한 물을 키친타월/휴지에 적셔 줄눈에 붙이고 30분 후 솔로 문질러 세척</div>
-                        <div class="task-tip">💡 팁: 환기 팬 및 창문을 상시 열어두고 고무장갑 필수 착용</div>
+                        <div class="task-desc">락스 희석액을 휴지에 적셔 줄눈 30분 불림 후 세척</div>
+                        <div class="task-tip">💡 환기팬 가동 및 고무장갑 착용</div>
                     </div>
                 </li>
                 <li class="task-item">
@@ -907,15 +823,15 @@
                         <span class="slider"></span>
                     </label>
                     <div class="task-details">
-                        <div class="task-name">변기, 세면대, 샤워부스 물때 세척 및 수전 광내기</div>
-                        <div class="task-desc">세제와 치약/구연산수를 사용하여 세면대 및 수전 물때를 완벽 제거</div>
+                        <div class="task-name">변기/세면대/샤워부스 물때 세척</div>
+                        <div class="task-desc">치약이나 구연산수로 세면대 및 수전 물때 제거</div>
                     </div>
                 </li>
             </ul>
         </div>
 
         <div class="task-group">
-            <div class="task-group-title">📅 2일차: 가구 이동 보조 & 베란다 물청소 (공동)</div>
+            <div class="task-group-title">📅 2일차: 가구 보조 & 베란다 물청소</div>
             <ul class="task-list">
                 <li class="task-item">
                     <label class="switch-container">
@@ -923,8 +839,8 @@
                         <span class="slider"></span>
                     </label>
                     <div class="task-details">
-                        <div class="task-name">오전: 각 방 높은 가구 상단 먼지 제거 & 무거운 가구 이동 보조</div>
-                        <div class="task-desc">가족들 방 청소 시 침대/장농 뒤쪽 가구 이동 및 상단 묵은 먼지 털어내기 지원</div>
+                        <div class="task-name">오전: 가구 상단 먼지 제거 & 이동 보조</div>
+                        <div class="task-desc">침대/장농 뒤쪽 가구 이동 및 상단 먼지 제거 지원</div>
                     </div>
                 </li>
                 <li class="task-item">
@@ -933,15 +849,15 @@
                         <span class="slider"></span>
                     </label>
                     <div class="task-details">
-                        <div class="task-name">오후: 아들과 함께 베란다/다용도실 짐 이동 및 바닥 물청소</div>
-                        <div class="task-desc">베란다 짐 이동 후 바닥 물청소 및 배수구 펄펄 끓는 물+베이킹소다 소독</div>
+                        <div class="task-name">오후: 아들과 베란다 짐 이동 및 바닥 물청소</div>
+                        <div class="task-desc">베란다 짐 이동 후 바닥 물청소 및 배수구 소독</div>
                     </div>
                 </li>
             </ul>
         </div>
 
         <div class="task-group">
-            <div class="task-group-title">📅 3일차: 전체 바닥 딥클리닝 & 최종 쓰레기 배출 (공동)</div>
+            <div class="task-group-title">📅 3일차: 전체 바닥 딥클리닝 & 배출</div>
             <ul class="task-list">
                 <li class="task-item">
                     <label class="switch-container">
@@ -949,8 +865,8 @@
                         <span class="slider"></span>
                     </label>
                     <div class="task-details">
-                        <div class="task-name">오전: 엄마와 함께 전체 바닥 스팀/습식 물걸레 딥클리닝</div>
-                        <div class="task-desc">청소기 후 집안 전체 바닥 2회 이상 꼼꼼하게 물걸레질 (원목/마루는 물기 짜서)</div>
+                        <div class="task-name">오전: 엄마와 전체 바닥 물걸레 딥클리닝</div>
+                        <div class="task-desc">집안 전체 바닥 2회 이상 꼼꼼하게 걸레질</div>
                     </div>
                 </li>
                 <li class="task-item">
@@ -959,8 +875,8 @@
                         <span class="slider"></span>
                     </label>
                     <div class="task-details">
-                        <div class="task-name">오후: 가족 전원 대형 종량제 봉투 배출 및 재활용 분리수거</div>
-                        <div class="task-desc">청소로 배출된 대형 쓰레기 및 분리수거함 단지 내 배출장으로 운반</div>
+                        <div class="task-name">오후: 쓰레기 봉투 및 재활용 배출</div>
+                        <div class="task-desc">대형 쓰레기 및 분리수거 단지 배출장 운반</div>
                     </div>
                 </li>
             </ul>
@@ -970,12 +886,12 @@
     <!-- TAB 2: MOM -->
     <div id="tab-mom" class="tab-content">
         <div class="person-header-box mom">
-            <div class="person-title-text">👩‍🍳 엄마의 전담 테스크 체크리스트</div>
-            <div class="progress-badge">완료 현황: <span id="mom-progress">0 / 7</span></div>
+            <div class="person-title-text">👩‍🍳 엄마 테스크</div>
+            <div class="progress-badge"><span id="mom-progress">0 / 7</span></div>
         </div>
 
         <div class="task-group">
-            <div class="task-group-title">📅 1일차 [오전]: 주방 전체 딥클리닝 (전담)</div>
+            <div class="task-group-title">📅 1일차 [오전]: 주방 전체 딥클리닝</div>
             <ul class="task-list">
                 <li class="task-item">
                     <label class="switch-container">
@@ -983,8 +899,8 @@
                         <span class="slider"></span>
                     </label>
                     <div class="task-details">
-                        <div class="task-name">주방 상/하부장 선반 수납품 정리 및 내부 닦기</div>
-                        <div class="task-desc">선반 안 그릇, 양념통 내리고 묵은 먼지 닦아낸 후 재정렬</div>
+                        <div class="task-name">주방 상/하부장 선반 수납품 정리</div>
+                        <div class="task-desc">그릇/양념통 내리고 묵은 먼지 닦은 후 재정렬</div>
                     </div>
                 </li>
                 <li class="task-item">
@@ -993,8 +909,8 @@
                         <span class="slider"></span>
                     </label>
                     <div class="task-details">
-                        <div class="task-name">냉장고 내부 유통기한 정돈 및 내·외부 닦기</div>
-                        <div class="task-desc">오래된 식재료 처분 후 베이킹소다수로 선반 및 선반 테두리 닦기</div>
+                        <div class="task-name">냉장고 유통기한 정돈 및 내·외부 닦기</div>
+                        <div class="task-desc">오래된 식재료 처분 후 베이킹소다수로 선반 닦기</div>
                     </div>
                 </li>
                 <li class="task-item">
@@ -1003,15 +919,15 @@
                         <span class="slider"></span>
                     </label>
                     <div class="task-details">
-                        <div class="task-name">주방 후드 필터 & 가스레인지/인덕션 기름때 제거</div>
-                        <div class="task-desc">뜨거운 물+과탄산소다 푼 물에 후드 필터 20분간 침지 세척 및 삼발이 기름때 불려 제거</div>
+                        <div class="task-name">후드 필터 & 가스레인지 기름때 제거</div>
+                        <div class="task-desc">과탄산소다 물에 후드 필터 침지 세척 및 기름때 제거</div>
                     </div>
                 </li>
             </ul>
         </div>
 
         <div class="task-group">
-            <div class="task-group-title">📅 2일차: 안방 케어 & 거실 먼지 제거 (전담/공동)</div>
+            <div class="task-group-title">📅 2일차: 안방 케어 & 거실 먼지 제거</div>
             <ul class="task-list">
                 <li class="task-item">
                     <label class="switch-container">
@@ -1019,8 +935,8 @@
                         <span class="slider"></span>
                     </label>
                     <div class="task-details">
-                        <div class="task-name">오전: 안방(방1) 창틀 청소, 가구 먼지 털기 및 침구류 세탁 배출</div>
-                        <div class="task-desc">안방 침구 커버 세탁기에 넣기, 안방 창틀 및 장농 위 먼지 집진 청소</div>
+                        <div class="task-name">오전: 안방 창틀 청소 & 침구류 세탁 배출</div>
+                        <div class="task-desc">안방 침구 커버 세탁, 창틀 및 가구 먼지 청소</div>
                     </div>
                 </li>
                 <li class="task-item">
@@ -1029,15 +945,15 @@
                         <span class="slider"></span>
                     </label>
                     <div class="task-details">
-                        <div class="task-name">오후: 딸과 함께 거실 소파/TV장/가전 뒤편 묵은 먼지 훔치기</div>
-                        <div class="task-desc">헌 스타킹이나 정전기 청소포를 활용하여 가전 및 거실장 묵은 먼지 제거</div>
+                        <div class="task-name">오후: 딸과 거실 소파/TV장 뒤 먼지 청소</div>
+                        <div class="task-desc">정전기 청소포로 가전 및 거실장 묵은 먼지 제거</div>
                     </div>
                 </li>
             </ul>
         </div>
 
         <div class="task-group">
-            <div class="task-group-title">📅 3일차: 전체 바닥 딥클리닝 & 최종 쓰레기 배출 (공동)</div>
+            <div class="task-group-title">📅 3일차: 전체 바닥 딥클리닝 & 배출</div>
             <ul class="task-list">
                 <li class="task-item">
                     <label class="switch-container">
@@ -1045,8 +961,8 @@
                         <span class="slider"></span>
                     </label>
                     <div class="task-details">
-                        <div class="task-name">오전: 아빠와 함께 전체 바닥 스팀/습식 물걸레 딥클리닝</div>
-                        <div class="task-desc">진공청소기 작업 후 거실 및 방 바닥 끈적임 없도록 걸레질 2회 진행</div>
+                        <div class="task-name">오전: 아빠와 전체 바닥 물걸레 딥클리닝</div>
+                        <div class="task-desc">바닥 끈적임 없도록 꼼꼼한 걸레질 2회 진행</div>
                     </div>
                 </li>
                 <li class="task-item">
@@ -1055,8 +971,8 @@
                         <span class="slider"></span>
                     </label>
                     <div class="task-details">
-                        <div class="task-name">오후: 가족 전원 쓰레기 배출 및 청소 도구 세척/건조</div>
-                        <div class="task-desc">사용한 누더기 걸레, 솔 세척 후 바짝 말리기 및 2시간 이상 전체 집안 환기</div>
+                        <div class="task-name">오후: 도구 세척/건조 및 환기</div>
+                        <div class="task-desc">걸레 세척/말리기 및 2시간 이상 집안 전체 환기</div>
                     </div>
                 </li>
             </ul>
@@ -1066,12 +982,12 @@
     <!-- TAB 3: SON -->
     <div id="tab-son" class="tab-content">
         <div class="person-header-box son">
-            <div class="person-title-text">🧑‍💻 아들의 전담 테스크 체크리스트</div>
-            <div class="progress-badge">완료 현황: <span id="son-progress">0 / 6</span></div>
+            <div class="person-title-text">🧑‍💻 아들 테스크</div>
+            <div class="progress-badge"><span id="son-progress">0 / 6</span></div>
         </div>
 
         <div class="task-group">
-            <div class="task-group-title">📅 1일차: 엄마/아빠 전담 작업 보조 (지원)</div>
+            <div class="task-group-title">📅 1일차: 엄마/아빠 전담 작업 보조</div>
             <ul class="task-list">
                 <li class="task-item">
                     <label class="switch-container">
@@ -1079,15 +995,15 @@
                         <span class="slider"></span>
                     </label>
                     <div class="task-details">
-                        <div class="task-name">주방 후드 필터 세척 및 화장실 수건/용품 이동 보조</div>
-                        <div class="task-desc">주방 식재료 정리 보조 및 아빠 욕실 청소 시 필요한 청소 용품/대야 세팅 지원</div>
+                        <div class="task-name">주방/화장실 정리 보조</div>
+                        <div class="task-desc">식재료 정리 지원 및 욕실 청소 용품 세팅 보조</div>
                     </div>
                 </li>
             </ul>
         </div>
 
         <div class="task-group">
-            <div class="task-group-title">📅 2일차: 아들방 전담 정돈 & 베란다 물청소 (전담/공동)</div>
+            <div class="task-group-title">📅 2일차: 아들방 전담 & 베란다 물청소</div>
             <ul class="task-list">
                 <li class="task-item">
                     <label class="switch-container">
@@ -1095,8 +1011,8 @@
                         <span class="slider"></span>
                     </label>
                     <div class="task-details">
-                        <div class="task-name">오전: 아들방(방2) 창틀 먼지 닦기 (신문지/쌀뜨물 활용)</div>
-                        <div class="task-desc">적신 신문지를 창틀에 넣고 나무젓가락으로 밀어 묵은 찌꺼기 닦아내기</div>
+                        <div class="task-name">오전: 아들방 창틀 먼지 닦기</div>
+                        <div class="task-desc">적신 신문지를 창틀에 넣고 묵은 찌꺼기 닦아내기</div>
                     </div>
                 </li>
                 <li class="task-item">
@@ -1105,8 +1021,8 @@
                         <span class="slider"></span>
                     </label>
                     <div class="task-details">
-                        <div class="task-name">오전: 아들방 책상/책장/컴퓨터 먼지 집진 & 옷장 잡동사니 정돈</div>
-                        <div class="task-desc">정전기 청소포로 전자제품 상단 먼지 털기 및 안 쓰는 물건 정리 배출</div>
+                        <div class="task-name">오전: 아들방 책상/책장 먼지 집진 & 옷 정돈</div>
+                        <div class="task-desc">전자제품 먼지 털기 및 옷장 옷 정리 배출</div>
                     </div>
                 </li>
                 <li class="task-item">
@@ -1115,15 +1031,15 @@
                         <span class="slider"></span>
                     </label>
                     <div class="task-details">
-                        <div class="task-name">오후: 아빠와 함께 베란다/다용도실 짐 옮기기 및 물청소</div>
-                        <div class="task-desc">베란다 물건 밖으로 잠시 내놓고 호수로 물 뿌려 바닥 솔질 청소</div>
+                        <div class="task-name">오후: 아빠와 베란다 짐 이동 및 물청소</div>
+                        <div class="task-desc">짐 내놓고 물 뿌려 바닥 솔질 청소 지원</div>
                     </div>
                 </li>
             </ul>
         </div>
 
         <div class="task-group">
-            <div class="task-group-title">📅 3일차: 집안 전체 청소기 담당 & 최종 배출 (공동)</div>
+            <div class="task-group-title">📅 3일차: 집안 전체 청소기 & 배출</div>
             <ul class="task-list">
                 <li class="task-item">
                     <label class="switch-container">
@@ -1131,8 +1047,8 @@
                         <span class="slider"></span>
                     </label>
                     <div class="task-details">
-                        <div class="task-name">오전: 딸과 함께 집안 전체 진공청소기 회전 (구석 노즐 사용)</div>
-                        <div class="task-desc">방 3개, 거실, 주방 바닥 문틀 구석구석 먼지 청소기 꼼꼼히 돌리기</div>
+                        <div class="task-name">오전: 딸과 집안 전체 진공청소기 돌리기</div>
+                        <div class="task-desc">방 3개, 거실, 주방 구석구석 먼지 청소기 청소</div>
                     </div>
                 </li>
                 <li class="task-item">
@@ -1141,8 +1057,8 @@
                         <span class="slider"></span>
                     </label>
                     <div class="task-details">
-                        <div class="task-name">오후: 대형 쓰레기 봉투 및 재활용품 단지 밖 운반</div>
-                        <div class="task-desc">3일간 나온 무거운 쓰레기 봉투 배출장으로 운반 보조</div>
+                        <div class="task-name">오후: 대형 쓰레기 봉투 및 재활용품 운반</div>
+                        <div class="task-desc">무거운 쓰레기 봉투 배출장으로 운반 보조</div>
                     </div>
                 </li>
             </ul>
@@ -1152,12 +1068,12 @@
     <!-- TAB 4: DAUGHTER -->
     <div id="tab-daughter" class="tab-content">
         <div class="person-header-box daughter">
-            <div class="person-title-text">👩‍🎨 딸의 전담 테스크 체크리스트</div>
-            <div class="progress-badge">완료 현황: <span id="daughter-progress">0 / 6</span></div>
+            <div class="person-title-text">👩‍🎨 딸 테스크</div>
+            <div class="progress-badge"><span id="daughter-progress">0 / 6</span></div>
         </div>
 
         <div class="task-group">
-            <div class="task-group-title">📅 1일차: 주방/욕실 정리 보조 (지원)</div>
+            <div class="task-group-title">📅 1일차: 주방/욕실 정리 보조</div>
             <ul class="task-list">
                 <li class="task-item">
                     <label class="switch-container">
@@ -1165,15 +1081,15 @@
                         <span class="slider"></span>
                     </label>
                     <div class="task-details">
-                        <div class="task-name">주방 식기 비우기 및 욕실 물품 세척 보조</div>
-                        <div class="task-desc">엄마 주방 상부장 정리 시 그릇 전달 및 아빠 욕실 세척 후 물품 세척 보조</div>
+                        <div class="task-name">주방 식기 비우기 및 욕실 보조</div>
+                        <div class="task-desc">엄마 그릇 전달 및 아빠 욕실 세척 후 물품 보조</div>
                     </div>
                 </li>
             </ul>
         </div>
 
         <div class="task-group">
-            <div class="task-group-title">📅 2일차: 딸방 전담 정돈 & 거실 유리/가전 닦기 (전담/공동)</div>
+            <div class="task-group-title">📅 2일차: 딸방 전담 & 거실 유리/가전 닦기</div>
             <ul class="task-list">
                 <li class="task-item">
                     <label class="switch-container">
@@ -1181,8 +1097,8 @@
                         <span class="slider"></span>
                     </label>
                     <div class="task-details">
-                        <div class="task-name">오전: 딸방(방3) 창틀 닦기 및 침구 정리 배출</div>
-                        <div class="task-desc">창틀 먼지 청소포로 닦고 침구 커버 분리하여 세탁 바구니 배출</div>
+                        <div class="task-name">오전: 딸방 창틀 닦기 및 침구 정리 배출</div>
+                        <div class="task-desc">창틀 먼지 닦고 침구 커버 분리 세탁 배출</div>
                     </div>
                 </li>
                 <li class="task-item">
@@ -1191,8 +1107,8 @@
                         <span class="slider"></span>
                     </label>
                     <div class="task-details">
-                        <div class="task-name">오전: 딸방 화장대/책상/선반 정돈 및 옷장 옷 정리</div>
-                        <div class="task-desc">화장품 먼지 닦기, 옷장 속 안 입는 옷 분류해 내놓기</div>
+                        <div class="task-name">오전: 딸방 화장대/책상 정돈 및 옷 정리</div>
+                        <div class="task-desc">화장품 먼지 닦기, 옷장 속 안 입는 옷 분류</div>
                     </div>
                 </li>
                 <li class="task-item">
@@ -1201,15 +1117,15 @@
                         <span class="slider"></span>
                     </label>
                     <div class="task-details">
-                        <div class="task-name">오후: 엄마와 함께 거실 TV, 장식장, 창문 안쪽 유리창 닦기</div>
-                        <div class="task-desc">유리 세정제로 거실 유리창 얼룩 세척 및 TV screen 극세사 천으로 닦기</div>
+                        <div class="task-name">오후: 엄마와 거실 TV, 유리창 닦기</div>
+                        <div class="task-desc">유리 세정제로 거실 유리창 및 TV 화면 닦기</div>
                     </div>
                 </li>
             </ul>
         </div>
 
         <div class="task-group">
-            <div class="task-group-title">📅 3일차: 집안 전체 청소기 보조 & 마무리 정리 (공동)</div>
+            <div class="task-group-title">📅 3일차: 집안 전체 청소기 & 마무리</div>
             <ul class="task-list">
                 <li class="task-item">
                     <label class="switch-container">
@@ -1217,8 +1133,8 @@
                         <span class="slider"></span>
                     </label>
                     <div class="task-details">
-                        <div class="task-name">오전: 아들과 함께 집안 전체 청소기 1차 돌리기</div>
-                        <div class="task-desc">바닥 잔여 먼지 청소기 털어내기 및 걸레질 전 공간 확보</div>
+                        <div class="task-name">오전: 아들과 집안 전체 청소기 1차 돌리기</div>
+                        <div class="task-desc">잔여 먼지 청소기 털어내기 및 걸레질 전 공간 확보</div>
                     </div>
                 </li>
                 <li class="task-item">
@@ -1227,8 +1143,8 @@
                         <span class="slider"></span>
                     </label>
                     <div class="task-details">
-                        <div class="task-name">오후: 분리수거 재활용품 분류 및 집안 전체 환기</div>
-                        <div class="task-desc">비닐, 플라스틱, 종이 3대 분리수거함 분류 묶기 및 창문 전체 열기</div>
+                        <div class="task-name">오후: 분리수거 재활용품 분류 및 환기</div>
+                        <div class="task-desc">비닐/플라스틱/종이 분류 묶기 및 창문 전체 열기</div>
                     </div>
                 </li>
             </ul>
@@ -1241,14 +1157,14 @@
         <div class="notice-grid">
             <div class="notice-col">
                 <ul class="notice-list">
-                    <li><b>자기 방 우선:</b> 아들과 딸은 자기 방 정리가 끝난 후 거실 공동 작업에 합류</li>
-                    <li><b>안전 지원:</b> 아빠는 가구 이동이나 높은 곳 청소 등 위험 요소 적극 지원</li>
+                    <li><b>자기 방 우선:</b> 아들과 딸은 자기 방 정리 후 거실 공동 작업 합류</li>
+                    <li><b>안전 지원:</b> 아빠는 가구 이동이나 높은 곳 청소 적극 지원</li>
                 </ul>
             </div>
             <div class="notice-col">
                 <ul class="notice-list">
                     <li><b>환기 필수:</b> 세제 청소 시 창문을 상시 열어두기</li>
-                    <li><b>보상과 휴식:</b> 대청소 완료 후 가족 함께 맛있는 식사나 휴식 시간 갖기</li>
+                    <li><b>보상과 휴식:</b> 대청소 완료 후 가족 함께 맛있는 식사 갖기</li>
                 </ul>
             </div>
         </div>
