@@ -229,7 +229,7 @@
             font-weight: 500;
         }
 
-        /* Responsive Mobile Task Cards (replaces table on mobile) */
+        /* Plan Cards Style (Used in both Mobile and PC now) */
         .plan-cards {
             display: flex;
             flex-direction: column;
@@ -276,7 +276,8 @@
             position: relative;
             padding-left: 80px;
             margin-bottom: 8px;
-            font-size: 13px;
+            font-size: 13.5px;
+            line-height: 1.5;
         }
 
         .role-item:last-child {
@@ -286,7 +287,7 @@
         .person-tag {
             position: absolute;
             left: 0;
-            top: 1px;
+            top: 2px;
             font-size: 10.5px;
             font-weight: 700;
             padding: 2px 6px;
@@ -314,9 +315,38 @@
         }
 
         .tip-content {
-            font-size: 12px;
+            font-size: 12.5px;
             color: #92400e;
-            line-height: 1.45;
+            line-height: 1.5;
+        }
+
+        /* Desktop Table View */
+        .plan-table {
+            width: 100%;
+            border-collapse: collapse;
+            display: none;
+        }
+
+        .plan-table th {
+            background-color: #f8fafc;
+            color: var(--text-muted);
+            font-size: 12px;
+            font-weight: 700;
+            text-align: left;
+            padding: 12px 18px;
+            border-bottom: 1px solid var(--border-color);
+            text-transform: uppercase;
+        }
+
+        .plan-table td {
+            padding: 16px 18px;
+            border-bottom: 1px solid var(--border-color);
+            vertical-align: top;
+            font-size: 13.5px;
+        }
+
+        .plan-table tr:last-child td {
+            border-bottom: none;
         }
 
         /* Individual Checklists */
@@ -502,7 +532,7 @@
             margin-bottom: 4px;
         }
 
-        /* Desktop Media Query (PC 화면 확장 적용) */
+        /* Desktop Media Query (PC & Tablet Optimization) */
         @media (min-width: 768px) {
             body { padding: 30px; }
             .header-card { padding: 32px; margin-bottom: 28px; }
@@ -518,16 +548,11 @@
             .day-title { font-size: 18px; }
             .day-focus { font-size: 13px; }
 
-            /* Desktop Table view (hide mobile cards) */
+            /* Switch to Table View on Desktop cleanly */
             .plan-cards { display: none; }
             .plan-table { display: table; }
 
             .notice-grid { flex-direction: row; }
-        }
-
-        /* Mobile View (Hide desktop table) */
-        @media (max-width: 767px) {
-            .plan-table { display: none; }
         }
     </style>
 </head>
@@ -607,7 +632,7 @@
                 <div class="day-focus">핵심: 물때, 기름때, 묵은 곰팡이 제거</div>
             </div>
 
-            <!-- Mobile Card View -->
+            <!-- Mobile View (Card Style) -->
             <div class="plan-cards">
                 <div class="plan-card-item">
                     <div class="plan-card-header">
@@ -657,6 +682,76 @@
                     </div>
                 </div>
             </div>
+
+            <!-- PC/Tablet View (Table Style) -->
+            <table class="plan-table">
+                <thead>
+                    <tr>
+                        <th style="width: 10%;">시간</th>
+                        <th style="width: 18%;">청소 구역</th>
+                        <th style="width: 44%;">담당자 및 상세 작업</th>
+                        <th style="width: 28%;">세부 노하우 & 팁</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td><span class="time-badge">오전</span></td>
+                        <td>
+                            <div class="zone-name">주방 전체</div>
+                            <div style="font-size:12px; color:#64748b;">상/하부장 & 가전</div>
+                        </td>
+                        <td>
+                            <div class="role-list">
+                                <div class="role-item">
+                                    <span class="person-tag tag-mom">엄마 (전담)</span>
+                                    상/하부장 선반 비우기, 냉장고 유통기한 정리 및 닦기
+                                </div>
+                                <div class="role-item">
+                                    <span class="person-tag tag-all">가족 공동</span>
+                                    후드 필터 탈거 세척, 가스레인지/인덕션 기름때 불림 및 닦기 지원
+                                </div>
+                            </div>
+                        </td>
+                        <td>
+                            <div class="tip-box">
+                                <div class="tip-title">💡 주방 세척 팁</div>
+                                <div class="tip-content">
+                                    <p>• <b>후드 필터:</b> 뜨거운 물 + 과탄산소다 20분 침지 후 세척</p>
+                                    <p>• <b>기름때:</b> 과탄산소다 반죽을 바르고 불린 후 닦아내기</p>
+                                </div>
+                            </div>
+                        </td>
+                    </tr>
+                    <tr>
+                        <td><span class="time-badge">오후</span></td>
+                        <td>
+                            <div class="zone-name">화장실 2곳</div>
+                            <div style="font-size:12px; color:#64748b;">안방 및 거실 욕실</div>
+                        </td>
+                        <td>
+                            <div class="role-list">
+                                <div class="role-item">
+                                    <span class="person-tag tag-dad">아빠 (전담)</span>
+                                    안방/거실 화장실 집중 세척: 환기구 디퓨저 탈거, 줄눈, 변기, 세면대, 물때 제거
+                                </div>
+                                <div class="role-item">
+                                    <span class="person-tag tag-all">가족 지원</span>
+                                    욕실 용품 배출 및 세척 후 도구 건조 보조
+                                </div>
+                            </div>
+                        </td>
+                        <td>
+                            <div class="tip-box">
+                                <div class="tip-title">💡 욕실 세척 팁</div>
+                                <div class="tip-content">
+                                    <p>• <b>줄눈 곰팡이:</b> 락스 희석액을 휴지에 적셔 줄눈 30분 후 세척</p>
+                                    <p>• <b>수전/거울:</b> 치약이나 구연산수로 물때 제거</p>
+                                </div>
+                            </div>
+                        </td>
+                    </tr>
+                </tbody>
+            </table>
         </div>
 
         <!-- DAY 2 -->
@@ -669,6 +764,7 @@
                 <div class="day-focus">핵심: 개인 공간 정돈 및 먼지 털기/물청소</div>
             </div>
 
+            <!-- Mobile View -->
             <div class="plan-cards">
                 <div class="plan-card-item">
                     <div class="plan-card-header">
@@ -726,6 +822,84 @@
                     </div>
                 </div>
             </div>
+
+            <!-- PC/Tablet View -->
+            <table class="plan-table">
+                <thead>
+                    <tr>
+                        <th style="width: 10%;">시간</th>
+                        <th style="width: 18%;">청소 구역</th>
+                        <th style="width: 44%;">담당자 및 상세 작업</th>
+                        <th style="width: 28%;">세부 노하우 & 팁</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td><span class="time-badge">오전</span></td>
+                        <td>
+                            <div class="zone-name">개별 방 3개</div>
+                            <div style="font-size:12px; color:#64748b;">안방 / 아들방 / 딸방</div>
+                        </td>
+                        <td>
+                            <div class="role-list">
+                                <div class="role-item">
+                                    <span class="person-tag tag-mom">엄마</span>
+                                    <b>안방 전담:</b> 창틀·가구 상단 먼지 털기, 침구류 세탁 배출
+                                </div>
+                                <div class="role-item">
+                                    <span class="person-tag tag-son">아들</span>
+                                    <b>아들방 전담:</b> 창틀 닦기, 책상/책장 먼지 집진, 침구 정리 및 옷 정돈
+                                </div>
+                                <div class="role-item">
+                                    <span class="person-tag tag-daughter">딸</span>
+                                    <b>딸방 전담:</b> 창틀 닦기, 화장대/책상 먼지 집진, 침구 정리 및 옷 정돈
+                                </div>
+                                <div class="role-item">
+                                    <span class="person-tag tag-dad">아빠</span>
+                                    각 방 무거운 가구 이동 보조 및 높이 있는 가구 상단 먼지 제거 지원
+                                </div>
+                            </div>
+                        </td>
+                        <td>
+                            <div class="tip-box">
+                                <div class="tip-title">💡 먼지제거 & 창틀 팁</div>
+                                <div class="tip-content">
+                                    <p>• <b>창틀 먼지:</b> 적신 신문지를 창틀에 넣고 나무젓가락으로 닦기</p>
+                                    <p>• <b>책상/가구:</b> 정전기 청소포로 1차 집진 후 물걸레질</p>
+                                </div>
+                            </div>
+                        </td>
+                    </tr>
+                    <tr>
+                        <td><span class="time-badge">오후</span></td>
+                        <td>
+                            <div class="zone-name">거실 & 베란다</div>
+                            <div style="font-size:12px; color:#64748b;">공용 공간 & 다용도실</div>
+                        </td>
+                        <td>
+                            <div class="role-list">
+                                <div class="role-item">
+                                    <span class="person-tag tag-dad">아빠 & 아들</span>
+                                    베란다/다용도실 짐 이동, 창틀 및 바닥 물청소, 배수구 소독
+                                </div>
+                                <div class="role-item">
+                                    <span class="person-tag tag-mom">엄마 & 딸</span>
+                                    거실 소파/TV장/가전 뒤편 먼지 청소, 유리창 안쪽 닦기
+                                </div>
+                            </div>
+                        </td>
+                        <td>
+                            <div class="tip-box">
+                                <div class="tip-title">💡 틈새 청소 팁</div>
+                                <div class="tip-content">
+                                    <p>• <b>소파/가전 뒤:</b> 헌 스타킹을 옷걸이에 끼워 묵은 먼지 훔치기</p>
+                                    <p>• <b>배수구 악취:</b> 베이킹소다+뜨거운 물을 부어 소독 및 악취 제거</p>
+                                </div>
+                            </div>
+                        </td>
+                    </tr>
+                </tbody>
+            </table>
         </div>
 
         <!-- DAY 3 -->
@@ -738,6 +912,7 @@
                 <div class="day-focus">핵심: 전체 바닥 습식/스팀 청소 및 쓰레기 배출</div>
             </div>
 
+            <!-- Mobile View -->
             <div class="plan-cards">
                 <div class="plan-card-item">
                     <div class="plan-card-header">
@@ -783,6 +958,72 @@
                     </div>
                 </div>
             </div>
+
+            <!-- PC/Tablet View -->
+            <table class="plan-table">
+                <thead>
+                    <tr>
+                        <th style="width: 10%;">시간</th>
+                        <th style="width: 18%;">청소 구역</th>
+                        <th style="width: 44%;">담당자 및 상세 작업</th>
+                        <th style="width: 28%;">세부 노하우 & 팁</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td><span class="time-badge">오전</span></td>
+                        <td>
+                            <div class="zone-name">전체 바닥</div>
+                            <div style="font-size:12px; color:#64748b;">거실 / 방 3 / 주방</div>
+                        </td>
+                        <td>
+                            <div class="role-list">
+                                <div class="role-item">
+                                    <span class="person-tag tag-son">아들 & 딸</span>
+                                    집안 전체 진공청소기 청소 (틈새/모서리 전용 노즐 활용)
+                                </div>
+                                <div class="role-item">
+                                    <span class="person-tag tag-dad">아빠 & 엄마</span>
+                                    스팀/습식 물걸레로 집안 전체 바닥 2회 이상 딥클리닝
+                                </div>
+                            </div>
+                        </td>
+                        <td>
+                            <div class="tip-box">
+                                <div class="tip-title">💡 바닥 클리닝 팁</div>
+                                <div class="tip-content">
+                                    <p>• <b>바닥 끈적임:</b> 식초를 약간 섞은 물로 걸레질하여 유분과 잡내 제거</p>
+                                    <p>• <b>강마루/원목:</b> 습기 손상 방지를 위해 물기를 바짝 짜낸 걸레만 사용</p>
+                                </div>
+                            </div>
+                        </td>
+                    </tr>
+                    <tr>
+                        <td><span class="time-badge">오후</span></td>
+                        <td>
+                            <div class="zone-name">마무리 & 배출</div>
+                            <div style="font-size:12px; color:#64748b;">전 구역 최종 점검</div>
+                        </td>
+                        <td>
+                            <div class="role-list">
+                                <div class="role-item">
+                                    <span class="person-tag tag-all">가족 전원</span>
+                                    종량제 봉투 배출, 재활용 분리수거, 청소 도구 세척 및 건조
+                                </div>
+                            </div>
+                        </td>
+                        <td>
+                            <div class="tip-box">
+                                <div class="tip-title">💡 최종 마무리 팁</div>
+                                <div class="tip-content">
+                                    <p>• <b>전체 환기:</b> 청소 종료 후 2시간 이상 전체 창문을 열어 냄새/습기 배출</p>
+                                    <p>• <b>도구 건조:</b> 걸레 및 청소 솔은 바짝 말려 세균 번식 방지</p>
+                                </div>
+                            </div>
+                        </td>
+                    </tr>
+                </tbody>
+            </table>
         </div>
     </div>
 
