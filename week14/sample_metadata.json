@@ -1,24 +1,10 @@
 {
-  "name": "KNU NFT #0",
-  "description": "경북대학교 블록체인 기술 강의 2026 — 수료 기념 NFT (ICAB0203-001)",
-  "image": "ipfs://bafybeigdyrzt5sfp7udm7hu76uh7y26nf3efuylqabf3oclgtqy55fbzdi/knu_blockchain_2026.png",
-  "external_url": "https://github.com/Kenny-0633-Lee/Blockchain_2026",
-  "attributes": [
-    {
-      "trait_type": "Year",
-      "value": "2026"
-    },
-    {
-      "trait_type": "Semester",
-      "value": "Spring"
-    },
-    {
-      "trait_type": "Course",
-      "value": "ICAB0203-001"
-    },
-    {
-      "trait_type": "University",
-      "value": "Kyungpook National University"
-    }
-  ]
+    "name": "KNU NFT #본인_학번_끝네자리",
+    "description": "경북대학교 블록체인 기술 수업 NFT",
+    "image": "ipfs://본인_이미지_CID",
+    "attributes": [
+        { "trait_type": "Course", "value": "ICAB0203-001" },
+        { "trait_type": "Student", "value": "본인 이름" },
+        { "trait_type": "Semester", "value": "2026 Spring" }
+    ]
 }
