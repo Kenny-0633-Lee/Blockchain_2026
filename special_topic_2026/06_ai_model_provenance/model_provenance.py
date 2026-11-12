@@ -1,32 +1,36 @@
 """
 06_ai_model_provenance/model_provenance.py  (특강 2026-11-25)
 =============================================================
-AI 모델 출처 증명: 가중치 파일을 조각내 Merkle root 로 서명하면, 한 바이트 변조(백도어)도 잡힌다
+AI 모델 출처 증명: 가중치 파일을 조각내 Merkle root 로 서명하면, 한 비트 변조(백도어)도 잡힌다
 
-보여줄 것
-  1) 모델 가중치 16조각 -> Merkle root -> 제공자가 ECDSA 서명 (원장/레지스트리에는 root 만 기록)
-  2) 미러 사이트에서 받은 모델 검증: 정상 / 한 바이트 변조
-  3) 어느 조각이 바뀌었는지 root 에서 아래로 내려가며 log n 번 비교로 찾기
-  4) 조각 하나만 받아 증명 경로(4개 해시)로 검증 (전체 다운로드 불필요)
-  5) 파인튜닝 이력: 체크포인트가 이전 root 를 해시로 물고 있어 이력 조작을 막는다
+진행 (Enter 로 한 단계씩, a = 끝까지, q = 종료)
+  1) 모델 가중치 16조각을 만들고 조각마다 해시
+  2) Merkle root 계산 -> 제공자가 ECDSA 서명 (레지스트리/체인에는 root 만 기록)
+  3) 미러 사이트에서 받은 모델 검증: 정상
+  4) 조각 9 의 1비트만 뒤집는다(백도어 삽입 가정) -> root 가 완전히 달라짐
+  5) 어느 조각인지 root 에서 내려가며 4번 비교로 찾기
+  6) 조각 1개 + 증명 경로(해시 4개)만으로 검증
+  7) 파인튜닝 이력을 해시 체인으로 묶기
 
-실행 (macOS 터미널 / Windows PowerShell·Git Bash 공통, 저장소 루트에서)
+실행 (저장소 루트에서, macOS 터미널 / Windows PowerShell·Git Bash 공통)
   uv run python special_topic_2026/06_ai_model_provenance/model_provenance.py
+  uv run python special_topic_2026/06_ai_model_provenance/model_provenance.py --web   # 브라우저 시각화
+옵션: --auto(멈춤 없이) --fast(애니메이션 없이)
 
 ※ '가중치'는 시연용 난수 바이트입니다. 실제 모델 파일(.safetensors 등)도 같은 방식으로 조각 해시를 만들 수 있습니다.
 """
 import base64
 import hashlib
 import sys
+from pathlib import Path
 
 from cryptography.exceptions import InvalidSignature
 from cryptography.hazmat.primitives import hashes
 from cryptography.hazmat.primitives.asymmetric import ec
 
-try:
-    sys.stdout.reconfigure(encoding="utf-8")
-except Exception:
-    pass
+sys.path.insert(0, str(Path(__file__).resolve().parents[1]))
+from _common.demo_kit import (bad, c, done, good, kv, line, open_web, pause, say, sleep, step, title,
+                              wants_web)
 
 N_SHARDS, SHARD_BYTES = 16, 4096
 
@@ -35,8 +39,11 @@ def h(b: bytes) -> bytes:
     return hashlib.sha256(b).digest()
 
 
+def s8(b: bytes) -> str:
+    return b.hex()[:8]
+
+
 def make_model(seed: str):
-    """결정적 난수 바이트 16조각 (시연 재현용)"""
     shards = []
     for i in range(N_SHARDS):
         buf, ctr = b"", 0
@@ -52,7 +59,7 @@ def tree(shards):
     while len(levels[-1]) > 1:
         cur = levels[-1]
         levels.append([h(cur[i] + cur[i + 1]) for i in range(0, len(cur), 2)])
-    return levels  # 16 = 2^4 이므로 복제 불필요
+    return levels
 
 
 def proof(levels, idx):
@@ -61,23 +68,6 @@ def proof(levels, idx):
         out.append((lv[idx ^ 1], "R" if idx ^ 1 > idx else "L"))
         idx //= 2
     return out
-
-
-def verify_shard(shard, pf, root):
-    cur = h(shard)
-    for sib, side in pf:
-        cur = h(cur + sib) if side == "R" else h(sib + cur)
-    return cur == root
-
-
-def locate(a, b):
-    """두 트리의 root 가 다를 때, 위에서 아래로 다른 쪽 자식만 따라 내려간다. (비교 횟수 반환)"""
-    idx, cmp = 0, 0
-    for d in range(len(a) - 1, 0, -1):
-        left = idx * 2
-        cmp += 1
-        idx = left if a[d - 1][left] != b[d - 1][left] else left + 1
-    return idx, cmp
 
 
 def sign(priv, data: bytes) -> str:
@@ -93,55 +83,108 @@ def verify_sig(pub, data: bytes, sig: str) -> bool:
 
 
 def main():
+    if wants_web():
+        open_web(Path(__file__).with_name("provenance_viz.html"))
+        return
+
+    title("AI 모델 출처 증명 — Merkle root + 서명")
+    say("질문: 내가 내려받은 이 모델 파일이, 제공자가 공개한 바로 그 모델이 맞는가? (백도어는 없는가?)")
     provider = ec.generate_private_key(ec.SECP256R1())
     pub = provider.public_key()
 
-    print("[1] 모델 제공자: 16조각 -> Merkle root -> 서명 (이 root 만 공개 레지스트리/체인에 기록)")
+    step("1. 모델 가중치(시연용 16조각 × 4,096바이트)를 조각내고, 조각마다 SHA-256 해시")
     shards = make_model("demo-llm-v1")
     lv = tree(shards)
+    for i, s in enumerate(shards):
+        line(f"  조각 {i:>2}  앞 8바이트 {s[:8].hex()}…   해시 {c(s8(lv[0][i]), 'cyan')}…", 0.15)
+    say("실제 LLM 은 수 GB~수백 GB. 조각(shard)이 수천 개여도 같은 방식.")
+
+    step("2. 해시를 Merkle 트리로 묶어 root 를 만들고, 제공자가 root 에 서명한다")
+    for d in range(1, len(lv)):
+        name = "root" if d == len(lv) - 1 else f"L{d}"
+        row = " ".join(s8(x)[:6] for x in lv[d])
+        line(f"  {name:<5} {row}", 0.5)
     root = lv[-1][0]
     sig = sign(provider, root)
-    print(f"  모델 크기(시연): {N_SHARDS} x {SHARD_BYTES}B   root = {root.hex()[:32]}…")
-    print(f"  제공자 서명: {sig[:28]}…  검증: {verify_sig(pub, root, sig)}")
+    print()
+    kv("Merkle root", c(root.hex(), "green", "bold"), width=14)
+    kv("제공자 서명", c(sig[:36] + "…", "cyan"), width=14)
+    (good if verify_sig(pub, root, sig) else bad)("제공자 공개키로 서명 검증 통과")
+    say("레지스트리(또는 블록체인)에는 root 와 서명만 올린다. 모델 파일 자체는 올리지 않는다 (수십 GB).")
 
-    print("\n[2] 사용자가 미러에서 내려받아 검증")
+    step("3. 사용자가 미러 사이트에서 모델을 내려받아 root 를 다시 계산")
     got = tree(shards)
-    print(f"  정상 파일  : root 일치 = {got[-1][0] == root}")
+    kv("계산한 root", got[-1][0].hex()[:40] + "…", width=14)
+    kv("공개된 root", root.hex()[:40] + "…", width=14)
+    good("일치 → 제공자가 공개한 모델 그대로")
+
+    step("4. 미러 운영자가 조각 9 에서 '딱 1비트'만 뒤집는다 (백도어 삽입 가정)")
     evil = [bytearray(s) for s in shards]
-    evil[9][1234] ^= 0x01  # 조각 9의 한 비트만 뒤집음 (백도어 삽입 가정)
+    pos, bit = 1234, 0
+    before = evil[9][pos]
+    evil[9][pos] ^= 1 << bit
+    after = evil[9][pos]
     evil = [bytes(s) for s in evil]
+    kv("변조 위치", f"조각 9 의 {pos}번째 바이트, {bit}번 비트", width=14)
+    kv("바이트 값", f"{before:08b} → {c(f'{after:08b}', 'red', 'bold')}", width=14)
+    kv("파일 크기", f"{N_SHARDS * SHARD_BYTES:,} 바이트 중 1비트 (= {1 / (N_SHARDS * SHARD_BYTES * 8):.6%})", width=14)
     lv_evil = tree(evil)
-    print(f"  1비트 변조 : root 일치 = {lv_evil[-1][0] == root}   (새 root = {lv_evil[-1][0].hex()[:16]}…)")
-    print("  -> 모델 전체 {:,} 바이트 중 1비트가 달라졌을 뿐인데 root 가 완전히 바뀐다.".format(N_SHARDS * SHARD_BYTES))
+    pause("Enter ▶ 해시 다시 계산")
+    kv("조각 9 해시", f"{s8(lv[0][9])}… → {c(s8(lv_evil[0][9]), 'red', 'bold')}…", width=14)
+    for d in range(1, len(lv)):
+        sleep(0.4)
+        idx = 9 >> d
+        name = "root" if d == len(lv) - 1 else f"L{d}"
+        kv(f"{name} 해시", f"{s8(lv[d][idx])}… → {c(s8(lv_evil[d][idx]), 'red', 'bold')}…", width=14)
+    print()
+    bad(f"새 root {lv_evil[-1][0].hex()[:24]}…  ≠  공개된 root {root.hex()[:24]}…  → 사용 금지")
+    say("눈에 보이지도 않는 1비트가, 해시를 타고 올라가 root 를 완전히 바꾼다 (눈사태 효과).")
 
-    print("\n[3] 어느 조각이 바뀌었나? root 에서 내려가며 비교")
-    idx, cmp = locate(lv, lv_evil)
-    print(f"  찾은 조각: #{idx}  (실제 변조 조각: #9)   비교 횟수 {cmp}회 (=log2 {N_SHARDS})")
-    print(f"  전체를 하나씩 비교하면 {N_SHARDS}회. 조각이 100만 개여도 20회.")
+    step("5. 어느 조각이 바뀌었나? root 에서 아래로 내려가며 '다른 쪽'만 따라간다")
+    idx, cmp_n = 0, 0
+    for d in range(len(lv) - 1, 0, -1):
+        left = idx * 2
+        cmp_n += 1
+        same_left = lv[d - 1][left] == lv_evil[d - 1][left]
+        nxt = left + 1 if same_left else left
+        line(f"  레벨 {d} → {d - 1}:  왼쪽 자식 {s8(lv[d - 1][left])} vs {s8(lv_evil[d - 1][left])}  "
+             f"{'같음 → 오른쪽으로' if same_left else c('다름 → 왼쪽으로', 'red')}", 0.7)
+        idx = nxt
+    good(f"변조된 조각 = #{idx}   (비교 {cmp_n}회 = log₂ {N_SHARDS})")
+    say(f"하나씩 모두 비교하면 {N_SHARDS}번. 조각이 100만 개여도 20번이면 찾는다 (opML 이분 탐색과 같은 원리).")
 
-    print("\n[4] 조각 #3 만 받아서 검증 (증명 경로)")
+    step("6. 모델 전체가 아니라 '조각 3 하나'만 받아서 검증 (증명 경로)")
     pf = proof(lv, 3)
-    print(f"  받는 데이터: 조각 1개 + 해시 {len(pf)}개   검증: {verify_shard(shards[3], pf, root)}")
-    print(f"  변조 조각 검증: {verify_shard(evil[9], proof(lv, 9), root)}")
+    cur = h(shards[3])
+    print(f"  받는 데이터: 조각 3 ({SHARD_BYTES:,}B) + 해시 {len(pf)}개")
+    print(f"  시작: H(조각 3) = {s8(cur)}")
+    for k, (sib, side) in enumerate(pf, 1):
+        cur = h(cur + sib) if side == "R" else h(sib + cur)
+        line(f"  {k}) 형제({side}) {s8(sib)} 와 결합 → {s8(cur)}", 0.6)
+    (good if cur == root else bad)(f"계산한 root {s8(cur)}…  {'==' if cur == root else '≠'}  공개된 root {s8(root)}…")
+    cur = h(evil[9])
+    for sib, side in proof(lv, 9):
+        cur = h(cur + sib) if side == "R" else h(sib + cur)
+    (good if cur == root else bad)(f"변조된 조각 9 로 검증하면: root {s8(cur)}…  → {'통과' if cur == root else '실패 (변조 탐지)'}")
 
-    print("\n[5] 파인튜닝 이력: 체크포인트가 이전 root 를 물고 있다 (해시 체인)")
+    step("7. 파인튜닝 이력: 체크포인트 ID = H(이전 ID ‖ 이번 root) — 해시 체인")
     hist, prev = [], b"\x00" * 32
     for name in ["base", "finetune-A", "finetune-B"]:
-        sh = make_model(name)
-        r = tree(sh)[-1][0]
-        rec = h(prev + r)  # 체크포인트 ID = H(이전 ID || 이번 root)
-        hist.append((name, r, prev, rec))
-        print(f"  {name:<11} root={r.hex()[:10]}…  체크포인트 ID={rec.hex()[:10]}…")
+        r = tree(make_model(name))[-1][0]
+        rec = h(prev + r)
+        hist.append((name, r, rec))
+        line(f"  {name:<11} root {s8(r)}…   체크포인트 ID {c(s8(rec), 'cyan')}…  (이전 {s8(prev)}…)", 0.6)
         prev = rec
-    # base 의 root 를 바꾸면(= 이력 조작) 뒤의 ID 가 모두 달라진다
     fake_base = tree(make_model("base-backdoored"))[-1][0]
     p2 = h(b"\x00" * 32 + fake_base)
-    for name, r, _, _ in hist[1:]:
+    for _, r, _ in hist[1:]:
         p2 = h(p2 + r)
-    print(f"  base 를 몰래 교체하면 최종 ID 가 {hist[-1][3].hex()[:10]}… -> {p2.hex()[:10]}…  (이력 위조 즉시 탐지)")
+    print()
+    bad(f"base 를 몰래 교체하면 최종 ID 가 {s8(hist[-1][2])}… → {c(s8(p2), 'red')}…  (이력 위조 즉시 탐지)")
 
-    print("\n정리: 제공자 서명 + root 공개 = '이 모델이 그 모델이다'를 누구나 검증. 블록체인은 root 를 위조 불가능하게 게시하는 곳.")
-    print("한계: 모델이 '좋은지/안전한지'는 증명하지 않는다. 변조 여부와 출처만 증명한다.")
+    done("정리: 제공자 서명 + root 공개 = '이 모델이 그 모델이다'를 누구나 검증. 블록체인은 root 를 위조 불가능하게 게시하는 곳.")
+    say("한계: 모델이 좋은지·안전한지는 증명하지 않는다. 변조 여부와 출처만 증명한다.")
+    say("브라우저 시각화: 같은 명령에 --web")
 
 
 if __name__ == "__main__":

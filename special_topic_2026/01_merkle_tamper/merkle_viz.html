@@ -1,0 +1,240 @@
+<!doctype html>
+<html lang="ko">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Merkle Tree 시각화</title>
+<style>
+  :root{
+    --bg:#f7f8fa; --card:#ffffff; --ink:#1b2430; --muted:#5b6675; --line:#c9d1db;
+    --ok:#1a8f4c; --ok-bg:#e3f5ea; --bad:#d6342c; --bad-bg:#fde6e4;
+    --hi:#e0a100; --hi-bg:#fff4cc; --sib:#1f6fd1; --sib-bg:#e1eeff; --node:#eef2f7;
+  }
+  @media (prefers-color-scheme: dark){
+    :root:not([data-theme="light"]){
+      --bg:#12161c; --card:#1b212a; --ink:#e8edf3; --muted:#9aa6b5; --line:#38424f;
+      --ok:#4cc27f; --ok-bg:#16301f; --bad:#ff6b63; --bad-bg:#3a1b19;
+      --hi:#ffcb3d; --hi-bg:#3a3012; --sib:#6aa8ff; --sib-bg:#142842; --node:#232b36;
+    }
+  }
+  *{box-sizing:border-box}
+  body{margin:0;background:var(--bg);color:var(--ink);
+       font-family:"Pretendard","Apple SD Gothic Neo","Malgun Gothic","Noto Sans KR",system-ui,sans-serif;}
+  header{padding:18px 24px 6px}
+  h1{margin:0;font-size:28px}
+  .sub{color:var(--muted);margin-top:4px;font-size:16px}
+  .bar{display:flex;gap:10px;align-items:center;padding:10px 24px;flex-wrap:wrap}
+  button{font:inherit;font-size:17px;padding:9px 18px;border-radius:10px;border:1px solid var(--line);
+         background:var(--card);color:var(--ink);cursor:pointer}
+  button.primary{background:#2457d6;color:#fff;border-color:#2457d6}
+  button:disabled{opacity:.4;cursor:default}
+  .stepno{font-weight:700;color:var(--muted);margin-left:8px}
+  .caption{margin:6px 24px;padding:14px 18px;background:var(--card);border:1px solid var(--line);
+           border-radius:12px;font-size:20px;line-height:1.5;min-height:74px}
+  .caption b{color:var(--sib)}
+  .wrap{display:flex;gap:16px;padding:8px 24px 24px;flex-wrap:wrap;align-items:flex-start}
+  .svgbox{flex:1 1 820px;background:var(--card);border:1px solid var(--line);border-radius:12px;padding:6px;overflow:auto}
+  .panel{flex:1 1 300px;max-width:520px;background:var(--card);border:1px solid var(--line);border-radius:12px;padding:14px 16px}
+  .panel h3{margin:0 0 8px;font-size:18px}
+  .rootbox{font-family:ui-monospace,Menlo,Consolas,monospace;font-size:14px;word-break:break-all;
+           padding:8px 10px;border-radius:8px;background:var(--node);margin-bottom:8px}
+  .rootbox.bad{background:var(--bad-bg);color:var(--bad)}
+  .rootbox.ok{background:var(--ok-bg);color:var(--ok)}
+  .calc{font-family:ui-monospace,Menlo,Consolas,monospace;font-size:14px;line-height:1.7}
+  .tag{display:inline-block;padding:1px 8px;border-radius:999px;font-size:13px;font-weight:700}
+  .tag.ok{background:var(--ok-bg);color:var(--ok)} .tag.bad{background:var(--bad-bg);color:var(--bad)}
+  text{font-family:ui-monospace,Menlo,Consolas,monospace}
+  .hint{color:var(--muted);font-size:14px;margin-top:10px}
+  svg .leaf{cursor:pointer}
+</style>
+</head>
+<body>
+<header>
+  <h1>Merkle Tree — 변조가 루트까지 번지는 모습</h1>
+  <div class="sub">Space / Enter / → : 다음 단계 &nbsp;·&nbsp; ← : 이전 &nbsp;·&nbsp; R : 처음부터 &nbsp;·&nbsp; 마지막 단계에서는 거래(잎)를 클릭해 직접 변조</div>
+</header>
+<div class="bar">
+  <button id="prev">◀ 이전</button>
+  <button id="next" class="primary">다음 ▶</button>
+  <button id="reset">처음부터</button>
+  <span class="stepno" id="stepno"></span>
+</div>
+<div class="caption" id="caption"></div>
+<div class="wrap">
+  <div class="svgbox"><svg id="svg" viewBox="0 0 1130 600" width="100%" role="img" aria-label="Merkle tree"></svg></div>
+  <div class="panel">
+    <h3>블록 헤더에 들어가는 값</h3>
+    <div class="rootbox" id="rootNow">—</div>
+    <div id="rootCmp"></div>
+    <h3 style="margin-top:14px" id="calcTitle"></h3>
+    <div class="calc" id="calc"></div>
+    <div class="hint">해시 = SHA-256 (브라우저에서 직접 계산).<br>터미널 시연의 root(<code>f7a7ef…</code>)와 같은 값입니다.</div>
+  </div>
+</div>
+
+<script>
+// ---------- SHA-256 (외부 라이브러리 없이) ----------
+const SHA = (() => {
+  const primes = []; for (let n = 2; primes.length < 64; n++) { if (primes.every(p => n % p)) primes.push(n); }
+  const frac = x => Math.floor((x - Math.floor(x)) * 4294967296) >>> 0;
+  const K = primes.map(p => frac(Math.cbrt(p)));
+  const H0 = primes.slice(0, 8).map(p => frac(Math.sqrt(p)));
+  const rotr = (x, n) => (x >>> n) | (x << (32 - n));
+  return function hex(str) {
+    const m = new TextEncoder().encode(str), l = m.length, bits = l * 8;
+    const total = (((l + 9 + 63) >> 6) << 6), buf = new Uint8Array(total);
+    buf.set(m); buf[l] = 0x80;
+    const dv = new DataView(buf.buffer); dv.setUint32(total - 4, bits >>> 0); dv.setUint32(total - 8, Math.floor(bits / 4294967296));
+    const H = H0.slice(), w = new Uint32Array(64);
+    for (let o = 0; o < total; o += 64) {
+      for (let i = 0; i < 16; i++) w[i] = dv.getUint32(o + i * 4);
+      for (let i = 16; i < 64; i++) {
+        const s0 = rotr(w[i-15],7) ^ rotr(w[i-15],18) ^ (w[i-15] >>> 3);
+        const s1 = rotr(w[i-2],17) ^ rotr(w[i-2],19) ^ (w[i-2] >>> 10);
+        w[i] = (w[i-16] + s0 + w[i-7] + s1) >>> 0;
+      }
+      let [a,b,c,d,e,f,g,h] = H;
+      for (let i = 0; i < 64; i++) {
+        const S1 = rotr(e,6) ^ rotr(e,11) ^ rotr(e,25), ch = (e & f) ^ (~e & g);
+        const t1 = (h + S1 + ch + K[i] + w[i]) >>> 0;
+        const S0 = rotr(a,2) ^ rotr(a,13) ^ rotr(a,22), mj = (a & b) ^ (a & c) ^ (b & c);
+        const t2 = (S0 + mj) >>> 0;
+        h = g; g = f; f = e; e = (d + t1) >>> 0; d = c; c = b; b = a; a = (t1 + t2) >>> 0;
+      }
+      H[0]=(H[0]+a)>>>0; H[1]=(H[1]+b)>>>0; H[2]=(H[2]+c)>>>0; H[3]=(H[3]+d)>>>0;
+      H[4]=(H[4]+e)>>>0; H[5]=(H[5]+f)>>>0; H[6]=(H[6]+g)>>>0; H[7]=(H[7]+h)>>>0;
+    }
+    return H.map(x => x.toString(16).padStart(8, '0')).join('');
+  };
+})();
+
+// ---------- 데이터 (터미널 시연과 같은 거래) ----------
+const N = 16;
+const txText = (i, tampered) => `tx${String(i).padStart(2,'0')}: 사용자${i} -> 사용자${(i*7)%16} : ${tampered ? (10+i)*100 : 10+i} coin`;
+const amount = (i, tampered) => `${tampered ? (10+i)*100 : 10+i}`;
+const s6 = x => x.slice(0, 6);
+
+function build(tampered) {           // tampered: Set of leaf indexes
+  const lv = [Array.from({length:N}, (_, i) => SHA(txText(i, tampered.has(i))))];
+  while (lv[lv.length-1].length > 1) {
+    const cur = lv[lv.length-1], nx = [];
+    for (let i = 0; i < cur.length; i += 2) nx.push(SHA(cur[i] + cur[i+1]));
+    lv.push(nx);
+  }
+  return lv;
+}
+const base = build(new Set());
+
+// ---------- 단계 ----------
+const STEPS = [
+  {cap: '거래 16개를 <b>하나씩 해시</b>합니다. 해시는 거래 내용의 지문 — 한 글자만 달라도 완전히 다른 값이 됩니다.', vis: 0},
+  {cap: '두 개씩 묶어 부모 해시를 만듭니다.  <b>부모 = SHA256( 왼쪽 ‖ 오른쪽 )</b>  (L1)', vis: 1},
+  {cap: '같은 방식으로 한 층 더 올라갑니다. (L2)', vis: 2},
+  {cap: '(L3) — 이제 두 개만 남았습니다.', vis: 3},
+  {cap: '맨 위 <b>Merkle root</b>. 블록 헤더에는 이 값 하나만 들어갑니다. 거래 16개 전체가 이 한 줄에 묶여 있습니다.', vis: 4},
+  {cap: '<b>tx05 의 금액을 15 → 1500 으로 변조</b>했습니다. 바뀐 노드는 붉게 표시됩니다 — 잎에서 루트까지 <b>한 줄</b>로 번집니다.', vis: 4, tamper: [5]},
+  {cap: '<b>포함 증명</b>: "tx05 가 이 root 안에 있다"를 형제 해시 <b>4개</b>(파랑)만으로 확인합니다. 원본은 통과, 변조본은 실패.', vis: 4, tamper: [5], proof: 5},
+  {cap: '직접 해 보세요: <b>거래(잎)를 클릭</b>하면 금액이 바뀌고, 영향받는 경로가 붉게 표시됩니다. 다시 클릭하면 원래대로.', vis: 4, free: true},
+];
+
+let step = 0, tam = new Set();
+const svg = document.getElementById('svg');
+const X = i => 35 + i * 70, Y = d => 60 + (4 - d) * 118;
+const xAt = (d, i) => X(0) + (i * 2 ** d + (2 ** d - 1) / 2) * 70;   // 레벨 d 의 i 번째 노드 중심 x
+
+function render() {
+  const st = STEPS[step];
+  tam = st.free ? tam : new Set(st.tamper || []);
+  const cur = build(tam);
+  const proofIdx = st.proof;
+  const pathSet = new Set(), sibSet = new Set();
+  if (proofIdx !== undefined) {
+    let idx = proofIdx;
+    for (let d = 0; d < 4; d++) { pathSet.add(d + ':' + idx); sibSet.add(d + ':' + (idx ^ 1)); idx >>= 1; }
+    pathSet.add('4:0');
+  }
+  let out = '';
+  // 간선
+  for (let d = 1; d <= 4; d++) {
+    if (d > st.vis) break;
+    for (let i = 0; i < cur[d].length; i++) for (const k of [2*i, 2*i+1]) {
+      const changed = cur[d][i] !== base[d][i] && cur[d-1][k] !== base[d-1][k];
+      out += `<line x1="${xAt(d-1,k)}" y1="${Y(d-1)-20}" x2="${xAt(d,i)}" y2="${Y(d)+20}" stroke="${changed ? 'var(--bad)' : 'var(--line)'}" stroke-width="${changed ? 3 : 1.5}"/>`;
+    }
+  }
+  // 노드
+  for (let d = 0; d <= 4; d++) {
+    if (d > st.vis) break;
+    for (let i = 0; i < cur[d].length; i++) {
+      const w = d === 0 ? 64 : 76, x = xAt(d, i) - w / 2, y = Y(d) - 20;
+      const changed = cur[d][i] !== base[d][i], key = d + ':' + i;
+      let fill = 'var(--node)', stroke = 'var(--line)', col = 'var(--ink)';
+      if (changed) { fill = 'var(--bad-bg)'; stroke = 'var(--bad)'; col = 'var(--bad)'; }
+      else if (sibSet.has(key)) { fill = 'var(--sib-bg)'; stroke = 'var(--sib)'; }
+      else if (pathSet.has(key)) { fill = 'var(--hi-bg)'; stroke = 'var(--hi)'; }
+      out += `<g ${d === 0 && st.free ? `class="leaf" data-i="${i}"` : ''}>
+        <rect x="${x}" y="${y}" width="${w}" height="40" rx="8" fill="${fill}" stroke="${stroke}" stroke-width="${changed||sibSet.has(key)||pathSet.has(key)?2.5:1.5}"/>
+        <text x="${x + w/2}" y="${y + 26}" text-anchor="middle" font-size="${d === 4 ? 17 : 15}" font-weight="${d===4?700:500}" fill="${col}">${s6(cur[d][i])}</text></g>`;
+      if (d === 0) {
+        const t = tam.has(i);
+        out += `<text x="${xAt(0,i)}" y="${y + 60}" text-anchor="middle" font-size="14" fill="var(--muted)">tx${String(i).padStart(2,'0')}</text>
+                <text x="${xAt(0,i)}" y="${y + 78}" text-anchor="middle" font-size="14" font-weight="${t?800:400}" fill="${t ? 'var(--bad)' : 'var(--muted)'}">${amount(i, t)}</text>`;
+      }
+    }
+  }
+  const levelNames = ['L0 (거래 해시)', 'L1', 'L2', 'L3', 'root'];
+  for (let d = 0; d <= 4; d++) if (d <= st.vis) out += `<text x="4" y="${Y(d) - 28}" font-size="13" fill="var(--muted)">${levelNames[d]}</text>`;
+  svg.innerHTML = out;
+  if (st.free) svg.querySelectorAll('.leaf').forEach(g => g.addEventListener('click', () => {
+    const i = +g.dataset.i; tam.has(i) ? tam.delete(i) : tam.add(i); render();
+  }));
+
+  document.getElementById('caption').innerHTML = st.cap;
+  document.getElementById('stepno').textContent = `단계 ${step + 1} / ${STEPS.length}`;
+  document.getElementById('prev').disabled = step === 0;
+  document.getElementById('next').disabled = step === STEPS.length - 1;
+
+  const rootEl = document.getElementById('rootNow'), cmp = document.getElementById('rootCmp');
+  if (st.vis >= 4) {
+    const changed = cur[4][0] !== base[4][0];
+    rootEl.textContent = cur[4][0]; rootEl.className = 'rootbox' + (changed ? ' bad' : ' ok');
+    cmp.innerHTML = changed ? `<div class="rootbox">원래 root<br>${base[4][0]}</div><span class="tag bad">root 불일치 → 변조 탐지</span>`
+                            : '<span class="tag ok">변조 없음</span>';
+  } else { rootEl.textContent = '(아직 root 까지 올라가지 않음)'; rootEl.className = 'rootbox'; cmp.innerHTML = ''; }
+
+  // 증명 계산
+  const calc = document.getElementById('calc'), ct = document.getElementById('calcTitle');
+  if (proofIdx !== undefined) {
+    ct.textContent = '증명 계산 (tx05)';
+    let html = '';
+    for (const [label, tampered] of [['원본 tx05', false], ['변조 tx05', true]]) {
+      let c = SHA(txText(proofIdx, tampered)), idx = proofIdx;
+      html += `<div style="margin-top:8px"><b>${label}</b>  H(거래) = ${s6(c)}</div>`;
+      for (let d = 0; d < 4; d++) {
+        const sib = base[d][idx ^ 1], right = (idx ^ 1) > idx;
+        const nx = right ? SHA(c + sib) : SHA(sib + c);
+        html += `<div>${d+1}) ${right ? `H(${s6(c)} ‖ ${s6(sib)})` : `H(${s6(sib)} ‖ ${s6(c)})`} = ${s6(nx)}</div>`;
+        c = nx; idx >>= 1;
+      }
+      const ok = c === base[4][0];
+      html += `<div>계산한 root ${s6(c)} ${ok ? '==' : '≠'} ${s6(base[4][0])} <span class="tag ${ok ? 'ok' : 'bad'}">${ok ? '포함 확인' : '검증 실패'}</span></div>`;
+    }
+    calc.innerHTML = html;
+  } else if (st.free) {
+    ct.textContent = '현재 상태'; calc.innerHTML = tam.size ? `변조된 거래 ${tam.size}개: ${[...tam].sort((a,b)=>a-b).map(i=>'tx'+String(i).padStart(2,'0')).join(', ')}<br>root 가 달라졌는지 위에서 확인하세요.` : '변조 없음 — 잎을 클릭해 보세요.';
+  } else { ct.textContent = ''; calc.innerHTML = ''; }
+}
+
+const go = n => { const prev = step; step = Math.max(0, Math.min(STEPS.length - 1, n)); if (step !== 7 || prev !== 7) tam = new Set(); render(); };
+document.getElementById('next').onclick = () => go(step + 1);
+document.getElementById('prev').onclick = () => go(step - 1);
+document.getElementById('reset').onclick = () => { tam = new Set(); go(0); };
+addEventListener('keydown', e => {
+  if (['Enter', ' ', 'ArrowRight'].includes(e.key)) { e.preventDefault(); go(step + 1); }
+  else if (e.key === 'ArrowLeft') go(step - 1);
+  else if (e.key === 'r' || e.key === 'R') { tam = new Set(); go(0); }
+});
+render();
+</script>
+</body>
+</html>

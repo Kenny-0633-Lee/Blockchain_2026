@@ -1,0 +1,279 @@
+<!doctype html>
+<html lang="ko">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>opML 이분 탐색 · 불시 검사 시각화</title>
+<style>
+  :root{
+    --bg:#f7f8fa; --card:#ffffff; --ink:#1b2430; --muted:#5b6675; --line:#c9d1db;
+    --ok:#1a8f4c; --ok-bg:#e3f5ea; --bad:#d6342c; --bad-bg:#fde6e4;
+    --hi:#e0a100; --hi-bg:#fff4cc; --sib:#1f6fd1; --sib-bg:#e1eeff; --node:#eef2f7;
+    --cell-ok:#6cc78f; --cell-cand:#ffd24d; --cell-bad:#f3a09b; --cell-found:#d6342c;
+  }
+  @media (prefers-color-scheme: dark){
+    :root:not([data-theme="light"]){
+      --bg:#12161c; --card:#1b212a; --ink:#e8edf3; --muted:#9aa6b5; --line:#38424f;
+      --ok:#4cc27f; --ok-bg:#16301f; --bad:#ff6b63; --bad-bg:#3a1b19;
+      --hi:#ffcb3d; --hi-bg:#3a3012; --sib:#6aa8ff; --sib-bg:#142842; --node:#232b36;
+      --cell-ok:#2f8f5b; --cell-cand:#c99a10; --cell-bad:#8a3f3a; --cell-found:#ff6b63;
+    }
+  }
+  *{box-sizing:border-box}
+  body{margin:0;background:var(--bg);color:var(--ink);
+       font-family:"Pretendard","Apple SD Gothic Neo","Malgun Gothic","Noto Sans KR",system-ui,sans-serif;}
+  header{padding:18px 24px 6px}
+  h1{margin:0;font-size:28px}
+  .sub{color:var(--muted);margin-top:4px;font-size:16px}
+  .tabs{display:flex;gap:8px;padding:10px 24px 0}
+  .tab{font:inherit;font-size:18px;font-weight:700;padding:10px 18px;border-radius:10px 10px 0 0;border:1px solid var(--line);border-bottom:none;background:var(--node);color:var(--muted);cursor:pointer}
+  .tab.on{background:var(--card);color:var(--ink)}
+  .page{display:none;margin:0 24px 24px;background:var(--card);border:1px solid var(--line);border-radius:0 12px 12px 12px;padding:16px}
+  .page.on{display:block}
+  .bar{display:flex;gap:10px;align-items:center;flex-wrap:wrap;margin-bottom:10px}
+  button.b{font:inherit;font-size:17px;padding:9px 18px;border-radius:10px;border:1px solid var(--line);background:var(--card);color:var(--ink);cursor:pointer}
+  button.b.primary{background:#2457d6;color:#fff;border-color:#2457d6}
+  button.b:disabled{opacity:.4;cursor:default}
+  input[type=number]{font:inherit;font-size:17px;width:90px;padding:6px 8px;border-radius:8px;border:1px solid var(--line);background:var(--card);color:var(--ink)}
+  .caption{padding:12px 16px;background:var(--node);border-radius:10px;font-size:19px;line-height:1.5;min-height:62px;margin-bottom:12px}
+  .caption b{color:var(--sib)}
+  .cols{display:flex;gap:18px;flex-wrap:wrap;align-items:flex-start}
+  #grid{display:grid;grid-template-columns:repeat(32,17px);gap:2px;padding:6px;background:var(--node);border-radius:10px}
+  .cell{width:17px;height:17px;border-radius:3px;background:var(--cell-bad)}
+  .cell.ok{background:var(--cell-ok)} .cell.cand{background:var(--cell-cand)}
+  .cell.found{background:var(--cell-found);outline:3px solid var(--cell-found);outline-offset:1px;animation:pulse 1s infinite}
+  @keyframes pulse{50%{outline-offset:4px}}
+  .legend{display:flex;gap:14px;font-size:14px;color:var(--muted);margin:8px 0;flex-wrap:wrap}
+  .legend i{display:inline-block;width:14px;height:14px;border-radius:3px;vertical-align:-2px;margin-right:5px}
+  .side{flex:1 1 380px;min-width:320px}
+  .stat{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin-bottom:10px}
+  .stat div{background:var(--node);border-radius:10px;padding:8px 10px}
+  .stat b{display:block;font-size:26px}
+  .stat span{font-size:13px;color:var(--muted)}
+  #log{font-family:ui-monospace,Menlo,Consolas,monospace;font-size:14px;line-height:1.65;max-height:300px;overflow:auto;background:var(--node);border-radius:10px;padding:8px 12px}
+  .tagok{color:var(--ok);font-weight:700} .tagbad{color:var(--bad);font-weight:700}
+  .verdict{margin-top:10px;font-size:19px;padding:10px 14px;border-radius:10px}
+  .verdict.ok{background:var(--ok-bg);color:var(--ok)} .verdict.bad{background:var(--bad-bg);color:var(--bad)}
+  .sl{display:grid;grid-template-columns:auto 1fr auto;gap:8px 12px;align-items:center;margin:6px 0;font-size:18px}
+  .sl input[type=range]{width:100%}
+  .sl output{font-weight:700;min-width:60px;text-align:right}
+  canvas.plot{width:100%;max-width:720px;height:300px;background:var(--card);border:1px solid var(--line);border-radius:10px}
+  .hint{color:var(--muted);font-size:14px;margin-top:8px}
+</style>
+</head>
+<body>
+<header>
+  <h1>AI 추론 검증 — opML 이분 탐색 · 불시 검사</h1>
+  <div class="sub">Space / Enter / → : 다음 라운드(탭 A) &nbsp;·&nbsp; R : 처음부터 &nbsp;·&nbsp; 탭 B 는 슬라이더를 움직여 보세요</div>
+</header>
+<div class="tabs">
+  <button class="tab on" data-t="A">A. opML 이분 탐색</button>
+  <button class="tab" data-t="B">B. 불시 검사 손익</button>
+</div>
+
+<!-- ================= A ================= -->
+<div class="page on" id="pageA">
+  <div class="bar">
+    <label>제출자가 속인 단계 <input type="number" id="cheat" min="0" max="1023" value="637"></label>
+    <button class="b primary" id="next">다음 라운드 ▶</button>
+    <button class="b" id="auto">자동 재생</button>
+    <button class="b" id="reset">처음부터</button>
+  </div>
+  <div class="caption" id="capA"></div>
+  <div class="cols">
+    <div>
+      <div id="grid"></div>
+      <div class="legend">
+        <span><i style="background:var(--cell-ok)"></i>합의됨(두 사람의 상태가 같음)</span>
+        <span><i style="background:var(--cell-cand)"></i>후보 구간(아직 모름)</span>
+        <span><i style="background:var(--cell-bad)"></i>어긋남(이미 틀림)</span>
+      </div>
+      <div class="hint">칸 하나 = VM 1단계. 1,024단계 = 32 × 32. (실제 opML 의 한 단계는 VM 명령 1개)</div>
+    </div>
+    <div class="side">
+      <div class="stat">
+        <div><b id="sRound">0</b><span>비교 횟수 (라운드)</span></div>
+        <div><b id="sCand">1,024</b><span>남은 후보 단계</span></div>
+        <div><b id="sChain">0</b><span>체인이 직접 계산한 단계</span></div>
+      </div>
+      <div id="log"></div>
+      <div id="verdictA"></div>
+    </div>
+  </div>
+</div>
+
+<!-- ================= B ================= -->
+<div class="page" id="pageB">
+  <div class="caption" id="capB"></div>
+  <div class="cols">
+    <div style="flex:1 1 420px">
+      <div class="sl"><span>G (속여서 아끼는 비용)</span><input type="range" id="G" min="0.5" max="5" step="0.1" value="1"><output id="oG"></output></div>
+      <div class="sl"><span>S (적발 시 벌금·스테이크)</span><input type="range" id="S" min="1" max="100" step="1" value="20"><output id="oS"></output></div>
+      <div class="sl"><span>p (검사 확률)</span><input type="range" id="P" min="0" max="0.3" step="0.005" value="0.02"><output id="oP"></output></div>
+      <div id="evBox" class="verdict" style="margin-top:12px"></div>
+      <canvas class="plot" id="plot1" width="720" height="300" style="margin-top:12px"></canvas>
+      <div class="hint">세로축: 속이는 노드의 작업당 기대이익 (1−p)·G − p·S.  0 아래면 속이는 쪽이 손해. 점선 = 손익분기 p* = G/(G+S).</div>
+    </div>
+    <div style="flex:1 1 420px">
+      <div class="bar"><button class="b primary" id="sim">10,000건 시뮬레이션 ▶</button><span class="hint" id="simInfo"></span></div>
+      <canvas class="plot" id="plot2" width="720" height="300"></canvas>
+      <div class="hint">속이는 노드의 누적 손익 (정직한 노드 = 0 선). 적발되어도 계속 속인다고 가정한 단순 모델입니다.<br>실제 Proof of Sampling 은 평판·스테이크 비례 검사 확률과 중재 구조가 더 있습니다.</div>
+    </div>
+  </div>
+</div>
+
+<script>
+// ============================ 탭 ============================
+document.querySelectorAll('.tab').forEach(t => t.onclick = () => {
+  document.querySelectorAll('.tab').forEach(x => x.classList.toggle('on', x === t));
+  document.getElementById('pageA').classList.toggle('on', t.dataset.t === 'A');
+  document.getElementById('pageB').classList.toggle('on', t.dataset.t === 'B');
+  if (t.dataset.t === 'B') drawB();
+});
+const tabA = () => document.getElementById('pageA').classList.contains('on');
+
+// ============================ A. 이분 탐색 ============================
+const N = 1024;
+let lo, hi, round, done, cheatAt, timer = null;
+const grid = document.getElementById('grid'), cells = [];
+for (let i = 0; i < N; i++) { const d = document.createElement('div'); d.className = 'cell'; grid.appendChild(d); cells.push(d); }
+const fmt = n => n.toLocaleString('ko-KR');
+
+function resetA() {
+  clearInterval(timer); timer = null; document.getElementById('auto').textContent = '자동 재생';
+  cheatAt = Math.max(0, Math.min(1023, +document.getElementById('cheat').value || 0));
+  lo = 0; hi = N; round = 0; done = false;
+  document.getElementById('log').innerHTML = '';
+  document.getElementById('verdictA').innerHTML = '';
+  document.getElementById('capA').innerHTML =
+    '제출자가 AI 추론 결과를 체인에 올렸습니다. 체인이 1,024단계를 전부 다시 계산하면 가스가 폭발합니다. 도전자는 <b>"처음 어긋난 한 단계"</b>만 찾으면 됩니다. 0단계는 같고 1024단계는 다릅니다 (노랑 = 아직 모르는 구간).';
+  paintA(); stats();
+}
+function paintA() {
+  for (let t = 0; t < N; t++) {
+    let k = 'cell';
+    if (done && t === lo) k += ' found';
+    else if (t < lo) k += ' ok';
+    else if (t < hi) k += ' cand';
+    cells[t].className = k;
+  }
+}
+function stats() {
+  document.getElementById('sRound').textContent = round;
+  document.getElementById('sCand').textContent = fmt(hi - lo);
+  document.getElementById('sChain').textContent = done ? 1 : 0;
+}
+function stepA() {
+  if (done) return;
+  const mid = (lo + hi) >> 1;
+  round++;
+  const agree = mid <= cheatAt;                // 상태 s[mid] 는 cheatAt 까지는 두 사람이 같다
+  const log = document.getElementById('log');
+  log.innerHTML += `라운드 ${String(round).padStart(2,' ')}: 중간 ${String(mid).padStart(4,' ')}단계 상태 해시 비교 → ` +
+    (agree ? '<span class="tagok">일치 → 오른쪽 절반</span>' : '<span class="tagbad">불일치 → 왼쪽 절반</span>') + '<br>';
+  log.scrollTop = log.scrollHeight;
+  if (agree) lo = mid; else hi = mid;
+  document.getElementById('capA').innerHTML = agree
+    ? `<b>${mid}단계의 상태는 둘이 같습니다</b> → 문제는 그 뒤에 있습니다. 후보 구간은 오른쪽 절반 [${lo}, ${hi}].`
+    : `<b>${mid}단계의 상태가 다릅니다</b> → 문제는 그 앞(또는 그 지점)에 있습니다. 후보 구간은 왼쪽 절반 [${lo}, ${hi}].`;
+  if (hi - lo <= 1) {
+    done = true;
+    document.getElementById('capA').innerHTML =
+      `<b>${round}번 비교</b>로 후보가 1단계로 좁혀졌습니다 (log₂ 1024 = 10). 이제 체인(스마트 컨트랙트)이 <b>${lo} → ${hi} 단계 하나만</b> 직접 실행해서 누가 맞는지 판정합니다.`;
+    document.getElementById('verdictA').innerHTML =
+      `<div class="verdict ok">⚖ 체인이 ${lo}단계를 실행 → 도전자의 결과와 일치, 제출자는 불일치<br>
+       <b>제출자 패배 · 스테이크 몰수.</b>  체인 비용: 비교 ${round}번 + 1단계 (직접 재계산이면 ${fmt(N)}단계 → 약 ${Math.round(N / (round + 1))}배 절감)</div>`;
+    clearInterval(timer); timer = null; document.getElementById('auto').textContent = '자동 재생';
+  }
+  paintA(); stats();
+}
+document.getElementById('next').onclick = stepA;
+document.getElementById('reset').onclick = resetA;
+document.getElementById('cheat').onchange = resetA;
+document.getElementById('auto').onclick = () => {
+  if (timer) { clearInterval(timer); timer = null; document.getElementById('auto').textContent = '자동 재생'; return; }
+  if (done) resetA();
+  document.getElementById('auto').textContent = '정지';
+  timer = setInterval(stepA, 1100);
+};
+addEventListener('keydown', e => {
+  if (!tabA() || e.target.tagName === 'INPUT') return;
+  if (['Enter', ' ', 'ArrowRight'].includes(e.key)) { e.preventDefault(); stepA(); }
+  else if (e.key === 'r' || e.key === 'R') resetA();
+});
+
+// ============================ B. 불시 검사 ============================
+const $ = id => document.getElementById(id);
+const C1 = $('plot1').getContext('2d'), C2 = $('plot2').getContext('2d');
+let simRun = 0;
+const css = n => getComputedStyle(document.documentElement).getPropertyValue(n).trim();
+function params() { return {G: +$('G').value, S: +$('S').value, p: +$('P').value}; }
+const ev = (p, G, S) => (1 - p) * G - p * S;
+
+function drawB() {
+  const {G, S, p} = params(), pstar = G / (G + S);
+  $('oG').textContent = G.toFixed(1); $('oS').textContent = S; $('oP').textContent = p.toFixed(3);
+  const e = ev(p, G, S);
+  $('evBox').className = 'verdict ' + (e > 0 ? 'bad' : 'ok');
+  $('evBox').innerHTML = `속이는 노드의 기대이익 = (1−${p.toFixed(3)})×${G.toFixed(1)} − ${p.toFixed(3)}×${S} = <b>${e.toFixed(3)}</b><br>` +
+    (e > 0 ? '→ <b>속이는 쪽이 이득</b> (검사 확률이 p* 보다 낮음)' : '→ <b>정직하게 계산하는 쪽이 이득</b>') + ` &nbsp;·&nbsp; p* = ${pstar.toFixed(4)}`;
+  $('capB').innerHTML = `<b>"모든 결과를 다시 계산"하지 않고도</b> 속임수를 막을 수 있을까? 작업의 일부(확률 p)만 무작위로 재검사하고, 걸리면 스테이크 S 를 몰수합니다. 속여서 아끼는 비용 G 보다 <b>기대 벌금 p×S</b> 가 크면 속일 이유가 사라집니다.`;
+  // plot1: EV(p), p in [0, 0.3]
+  const W = 720, H = 300, L = 56, R = 16, T = 16, B = 38;
+  C1.clearRect(0, 0, W, H);
+  const ymax = Math.max(G, 1) * 1.05, ymin = Math.min(ev(0.3, G, S), -0.2) * 1.05;
+  const x = pp => L + (pp / 0.3) * (W - L - R), y = v => T + (ymax - v) / (ymax - ymin) * (H - T - B);
+  C1.strokeStyle = css('--line'); C1.fillStyle = css('--muted'); C1.lineWidth = 1; C1.font = '13px sans-serif';
+  C1.beginPath(); C1.moveTo(L, y(0)); C1.lineTo(W - R, y(0)); C1.stroke();
+  C1.fillText('0', L - 14, y(0) + 4);
+  for (let t = 0; t <= 0.3001; t += 0.05) { C1.fillText(t.toFixed(2), x(t) - 12, H - 16); C1.beginPath(); C1.moveTo(x(t), H - B); C1.lineTo(x(t), H - B + 4); C1.stroke(); }
+  C1.fillText('검사 확률 p →', W - 110, H - 2);
+  C1.fillText('기대이익', 4, T + 10);
+  // 영역 색: 이익 영역(빨강 연함) / 손해 영역(초록 연함)
+  C1.fillStyle = 'rgba(214,52,44,0.10)'; C1.fillRect(L, y(ymax), x(Math.min(pstar, 0.3)) - L, y(0) - y(ymax));
+  C1.fillStyle = 'rgba(26,143,76,0.10)'; C1.fillRect(x(Math.min(pstar, 0.3)), y(0), W - R - x(Math.min(pstar, 0.3)), y(ymin) - y(0));
+  C1.strokeStyle = css('--sib'); C1.lineWidth = 3; C1.beginPath();
+  for (let i = 0; i <= 120; i++) { const pp = 0.3 * i / 120, v = ev(pp, G, S); i ? C1.lineTo(x(pp), y(v)) : C1.moveTo(x(pp), y(v)); } C1.stroke();
+  if (pstar <= 0.3) { C1.setLineDash([6, 5]); C1.strokeStyle = css('--hi'); C1.lineWidth = 2; C1.beginPath(); C1.moveTo(x(pstar), T); C1.lineTo(x(pstar), H - B); C1.stroke(); C1.setLineDash([]);
+    C1.fillStyle = css('--ink'); C1.font = 'bold 14px sans-serif'; C1.fillText('p* = ' + pstar.toFixed(3), x(pstar) + 6, T + 16); }
+  C1.fillStyle = e > 0 ? css('--bad') : css('--ok'); C1.beginPath(); C1.arc(x(p), y(e), 7, 0, 7); C1.fill();
+  C1.fillStyle = css('--bad'); C1.font = '13px sans-serif'; C1.fillText('속이는 쪽이 이득', L + 8, y(0) - 8);
+  C1.fillStyle = css('--ok'); C1.fillText('속이면 손해', W - R - 90, y(0) + 18);
+}
+['G', 'S', 'P'].forEach(id => $(id).oninput = () => { simRun++; drawB(); clearSim(); });
+
+function mulberry32(a) { return function () { a |= 0; a = a + 0x6D2B79F5 | 0; let t = Math.imul(a ^ a >>> 15, 1 | a); t = t + Math.imul(t ^ t >>> 7, 61 | t) ^ t; return ((t ^ t >>> 14) >>> 0) / 4294967296; }; }
+function clearSim() { C2.clearRect(0, 0, 720, 300); axes2(-1, 1); $('simInfo').textContent = ''; }
+function axes2(ymin, ymax) {
+  const W = 720, H = 300, L = 64, R = 16, T = 16, B = 34; C2.clearRect(0, 0, W, H);
+  const y = v => T + (ymax - v) / (ymax - ymin) * (H - T - B);
+  C2.strokeStyle = css('--line'); C2.fillStyle = css('--muted'); C2.font = '13px sans-serif'; C2.lineWidth = 1;
+  C2.beginPath(); C2.moveTo(L, y(0)); C2.lineTo(W - R, y(0)); C2.stroke();
+  C2.fillText('0 (정직한 노드)', 4, y(0) + 4);
+  C2.fillText(Math.round(ymax).toLocaleString(), 4, T + 10); C2.fillText(Math.round(ymin).toLocaleString(), 4, H - B);
+  C2.fillText('작업 건수 →  (10,000)', W - 150, H - 8);
+}
+$('sim').onclick = () => {
+  const {G, S, p} = params(), run = ++simRun, rnd = mulberry32(2026);
+  const total = 10000, ys = []; let bal = 0, first = null;
+  for (let t = 1; t <= total; t++) { if (rnd() < p) { if (first === null) first = t; bal -= S; } else bal += G; ys.push(bal); }
+  const ymax = Math.max(1, ...ys) * 1.08, ymin = Math.min(-1, ...ys) * 1.08;
+  const W = 720, H = 300, L = 64, R = 16, T = 16, B = 34;
+  const x = t => L + t / total * (W - L - R), y = v => T + (ymax - v) / (ymax - ymin) * (H - T - B);
+  let drawn = 0;
+  (function frame() {
+    if (run !== simRun) return;
+    drawn = Math.min(total, drawn + 220);
+    axes2(ymin, ymax);
+    C2.strokeStyle = ys[drawn - 1] > 0 ? css('--bad') : css('--ok'); C2.lineWidth = 2.5; C2.beginPath();
+    for (let t = 0; t < drawn; t += 4) t ? C2.lineTo(x(t + 1), y(ys[t])) : C2.moveTo(x(1), y(ys[0])); C2.stroke();
+    $('simInfo').textContent = `${drawn.toLocaleString()}건 · 누적 ${ys[drawn - 1].toLocaleString()}` + (first ? ` · 첫 적발 ${first}번째` : '');
+    if (drawn < total) requestAnimationFrame(frame);
+    else $('simInfo').textContent = `누적 ${bal.toLocaleString()} → ` + (bal > 0 ? '속이는 쪽이 이득 (p < p*)' : '속이는 쪽이 손해 (p > p*)') + (first ? ` · 첫 적발 ${first}번째` : '');
+  })();
+};
+
+resetA(); clearSim(); drawB();
+</script>
+</body>
+</html>

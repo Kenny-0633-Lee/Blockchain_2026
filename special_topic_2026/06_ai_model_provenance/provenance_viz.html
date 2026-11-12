@@ -1,0 +1,253 @@
+<!doctype html>
+<html lang="ko">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>AI 모델 출처 증명 시각화</title>
+<style>
+  :root{
+    --bg:#f7f8fa; --card:#ffffff; --ink:#1b2430; --muted:#5b6675; --line:#c9d1db;
+    --ok:#1a8f4c; --ok-bg:#e3f5ea; --bad:#d6342c; --bad-bg:#fde6e4;
+    --hi:#e0a100; --hi-bg:#fff4cc; --sib:#1f6fd1; --sib-bg:#e1eeff; --node:#eef2f7;
+  }
+  @media (prefers-color-scheme: dark){
+    :root:not([data-theme="light"]){
+      --bg:#12161c; --card:#1b212a; --ink:#e8edf3; --muted:#9aa6b5; --line:#38424f;
+      --ok:#4cc27f; --ok-bg:#16301f; --bad:#ff6b63; --bad-bg:#3a1b19;
+      --hi:#ffcb3d; --hi-bg:#3a3012; --sib:#6aa8ff; --sib-bg:#142842; --node:#232b36;
+    }
+  }
+  *{box-sizing:border-box}
+  body{margin:0;background:var(--bg);color:var(--ink);
+       font-family:"Pretendard","Apple SD Gothic Neo","Malgun Gothic","Noto Sans KR",system-ui,sans-serif;}
+  header{padding:18px 24px 6px}
+  h1{margin:0;font-size:28px}
+  .sub{color:var(--muted);margin-top:4px;font-size:16px}
+  .bar{display:flex;gap:10px;align-items:center;padding:10px 24px;flex-wrap:wrap}
+  button{font:inherit;font-size:17px;padding:9px 18px;border-radius:10px;border:1px solid var(--line);background:var(--card);color:var(--ink);cursor:pointer}
+  button.primary{background:#2457d6;color:#fff;border-color:#2457d6}
+  button:disabled{opacity:.4;cursor:default}
+  .stepno{font-weight:700;color:var(--muted);margin-left:8px}
+  .caption{margin:6px 24px;padding:14px 18px;background:var(--card);border:1px solid var(--line);border-radius:12px;font-size:20px;line-height:1.5;min-height:74px}
+  .caption b{color:var(--sib)}
+  .wrap{display:flex;gap:16px;padding:8px 24px 24px;flex-wrap:wrap;align-items:flex-start}
+  .card{background:var(--card);border:1px solid var(--line);border-radius:12px;padding:12px}
+  .grid{display:grid;grid-template-columns:repeat(4,104px);gap:10px}
+  .tile{border:2px solid var(--line);border-radius:10px;padding:5px;text-align:center;background:var(--node);cursor:pointer;position:relative}
+  .tile canvas{width:92px;height:92px;image-rendering:pixelated;border-radius:4px;display:block;margin:0 auto}
+  .tile .no{font-size:13px;font-weight:700;margin-top:3px}
+  .tile .hs{font-family:ui-monospace,Menlo,Consolas,monospace;font-size:13px}
+  .tile.bad{border-color:var(--bad);background:var(--bad-bg)}
+  .tile.sel{border-color:var(--hi);background:var(--hi-bg)}
+  .tile.prf{border-color:var(--sib);background:var(--sib-bg)}
+  .tile.found{outline:4px solid var(--bad)}
+  .right{flex:1 1 560px;display:flex;flex-direction:column;gap:12px}
+  .roots{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+  .rootbox{font-family:ui-monospace,Menlo,Consolas,monospace;font-size:13px;word-break:break-all;padding:8px 10px;border-radius:8px;background:var(--node)}
+  .rootbox h4{margin:0 0 4px;font-family:inherit;font-size:14px;color:var(--muted)}
+  .rootbox.ok{background:var(--ok-bg)} .rootbox.bad{background:var(--bad-bg);color:var(--bad)}
+  .verdict{font-size:20px;font-weight:700;padding:8px 12px;border-radius:8px}
+  .verdict.ok{background:var(--ok-bg);color:var(--ok)} .verdict.bad{background:var(--bad-bg);color:var(--bad)}
+  text{font-family:ui-monospace,Menlo,Consolas,monospace}
+  .hint{color:var(--muted);font-size:14px}
+  select{font:inherit;font-size:16px;padding:6px 8px;border-radius:8px;border:1px solid var(--line);background:var(--card);color:var(--ink)}
+</style>
+</head>
+<body>
+<header>
+  <h1>AI 모델 출처 증명 — 1비트 변조도 root 가 잡는다</h1>
+  <div class="sub">Space / Enter / → : 다음 단계 &nbsp;·&nbsp; ← : 이전 &nbsp;·&nbsp; R : 처음부터 &nbsp;·&nbsp; 변조할 조각은 아래에서 고를 수 있습니다 (기본 #9)</div>
+</header>
+<div class="bar">
+  <button id="prev">◀ 이전</button><button id="next" class="primary">다음 ▶</button><button id="reset">처음부터</button>
+  <label>변조할 조각 <select id="pick"></select></label>
+  <span class="stepno" id="stepno"></span>
+</div>
+<div class="caption" id="caption"></div>
+<div class="wrap">
+  <div class="card"><div class="grid" id="grid"></div>
+    <div class="hint" style="margin-top:8px">각 조각 = 가중치 4,096바이트 (그림은 앞 256바이트). 테두리 색은 상태, 아래 글자는 SHA-256 앞 6자리.</div></div>
+  <div class="right">
+    <div class="card"><svg id="svg" viewBox="0 0 720 300" width="100%" role="img" aria-label="Merkle tree"></svg></div>
+    <div class="card">
+      <div class="roots">
+        <div class="rootbox" id="pubRoot"><h4>공개된 root (제공자 서명 후 레지스트리/체인에 게시)</h4><span>(아직 없음)</span></div>
+        <div class="rootbox" id="myRoot"><h4>내가 내려받은 모델로 계산한 root</h4><span>—</span></div>
+      </div>
+      <div id="verdict" style="margin-top:10px"></div>
+      <div class="hint" id="extra" style="margin-top:8px"></div>
+    </div>
+  </div>
+</div>
+
+<script>
+// ---------- SHA-256 (바이트 입력, 외부 라이브러리 없음) ----------
+const SHA = (() => {
+  const primes = []; for (let n = 2; primes.length < 64; n++) { if (primes.every(p => n % p)) primes.push(n); }
+  const frac = x => Math.floor((x - Math.floor(x)) * 4294967296) >>> 0;
+  const K = primes.map(p => frac(Math.cbrt(p))), H0 = primes.slice(0, 8).map(p => frac(Math.sqrt(p)));
+  const rotr = (x, n) => (x >>> n) | (x << (32 - n));
+  return function digest(m) {          // Uint8Array -> Uint8Array(32)
+    const l = m.length, bits = l * 8, total = (((l + 9 + 63) >> 6) << 6), buf = new Uint8Array(total);
+    buf.set(m); buf[l] = 0x80;
+    const dv = new DataView(buf.buffer); dv.setUint32(total - 4, bits >>> 0); dv.setUint32(total - 8, Math.floor(bits / 4294967296));
+    const H = H0.slice(), w = new Uint32Array(64);
+    for (let o = 0; o < total; o += 64) {
+      for (let i = 0; i < 16; i++) w[i] = dv.getUint32(o + i * 4);
+      for (let i = 16; i < 64; i++) {
+        const s0 = rotr(w[i-15],7) ^ rotr(w[i-15],18) ^ (w[i-15] >>> 3), s1 = rotr(w[i-2],17) ^ rotr(w[i-2],19) ^ (w[i-2] >>> 10);
+        w[i] = (w[i-16] + s0 + w[i-7] + s1) >>> 0;
+      }
+      let [a,b,c,d,e,f,g,h] = H;
+      for (let i = 0; i < 64; i++) {
+        const S1 = rotr(e,6) ^ rotr(e,11) ^ rotr(e,25), ch = (e & f) ^ (~e & g), t1 = (h + S1 + ch + K[i] + w[i]) >>> 0;
+        const S0 = rotr(a,2) ^ rotr(a,13) ^ rotr(a,22), mj = (a & b) ^ (a & c) ^ (b & c), t2 = (S0 + mj) >>> 0;
+        h = g; g = f; f = e; e = (d + t1) >>> 0; d = c; c = b; b = a; a = (t1 + t2) >>> 0;
+      }
+      H[0]=(H[0]+a)>>>0; H[1]=(H[1]+b)>>>0; H[2]=(H[2]+c)>>>0; H[3]=(H[3]+d)>>>0; H[4]=(H[4]+e)>>>0; H[5]=(H[5]+f)>>>0; H[6]=(H[6]+g)>>>0; H[7]=(H[7]+h)>>>0;
+    }
+    const out = new Uint8Array(32), odv = new DataView(out.buffer); H.forEach((x, i) => odv.setUint32(i * 4, x)); return out;
+  };
+})();
+const hex = u => Array.from(u, b => b.toString(16).padStart(2, '0')).join('');
+const cat = (a, b) => { const r = new Uint8Array(a.length + b.length); r.set(a); r.set(b, a.length); return r; };
+const enc = s => new TextEncoder().encode(s);
+const s6 = u => hex(u).slice(0, 6);
+
+// ---------- 모델 (시연용 난수 바이트) ----------
+const N = 16, SB = 4096, FLIP_BYTE = 137, FLIP_BIT = 0;   // 그림에서 보이도록 앞 256바이트 안에서 변조
+function makeShard(i) {
+  const out = new Uint8Array(SB); let off = 0, ctr = 0;
+  while (off < SB) { const d = SHA(enc(`demo-llm-v1|${i}|${ctr++}`)); out.set(d.slice(0, Math.min(32, SB - off)), off); off += 32; }
+  return out;
+}
+const orig = Array.from({length: N}, (_, i) => makeShard(i));
+function tree(shards) {
+  const lv = [shards.map(s => SHA(s))];
+  while (lv[lv.length-1].length > 1) { const c = lv[lv.length-1], n = []; for (let i = 0; i < c.length; i += 2) n.push(SHA(cat(c[i], c[i+1]))); lv.push(n); }
+  return lv;
+}
+const baseT = tree(orig);
+const PUB = hex(baseT[4][0]);
+
+const STEPS = [
+  '모델 가중치를 <b>16조각</b>으로 나눕니다 (실제 LLM 은 수천 조각). 조각마다 SHA-256 해시를 계산합니다.',
+  '해시를 Merkle 트리로 묶어 <b>root</b> 를 만듭니다. 제공자가 이 root 에 <b>서명</b>해서 레지스트리(또는 블록체인)에 게시합니다. 모델 파일 자체는 올리지 않습니다.',
+  '사용자가 <b>미러 사이트</b>에서 모델을 내려받아 root 를 다시 계산합니다 → 공개된 root 와 <b>일치</b>.',
+  '미러 운영자가 조각에서 <b>딱 1비트</b>를 뒤집었습니다 (백도어 삽입 가정). 그림은 거의 그대로인데 해시와 root 는 완전히 달라집니다.',
+  '<b>어느 조각이 바뀌었나?</b> root 에서 내려가며 양쪽을 비교합니다 — 1/4 : 최상위 두 갈래 중 어느 쪽이 다른가?',
+  '2/4 : 다른 쪽 안에서 다시 두 갈래를 비교합니다.',
+  '3/4 : 한 층 더.',
+  '4/4 : 마지막 두 조각 중 해시가 다른 쪽 = <b>변조된 조각</b>. 비교는 4번(log₂16), 조각이 100만 개여도 20번이면 됩니다.',
+  '<b>증명 경로</b>: 모델 전체를 받지 않고, 조각 3 하나와 형제 해시 4개(파랑)만으로 "이 조각은 공개된 모델의 일부"임을 확인할 수 있습니다.',
+];
+let step = 0, tampered = -1;
+const pick = document.getElementById('pick');
+for (let i = 0; i < N; i++) pick.add(new Option('#' + i, i));
+pick.value = 9;
+
+function shardsNow() {
+  return orig.map((s, i) => {
+    if (i !== tampered) return s;
+    const c = s.slice(); c[FLIP_BYTE] ^= (1 << FLIP_BIT); return c;
+  });
+}
+function drawTile(canvas, bytes, flipMark) {
+  const ctx = canvas.getContext('2d'), img = ctx.createImageData(16, 16);
+  for (let i = 0; i < 256; i++) {
+    const v = bytes[i], p = i * 4;
+    img.data[p] = img.data[p+1] = img.data[p+2] = v; img.data[p+3] = 255;
+    if (flipMark && i === FLIP_BYTE) { img.data[p] = 230; img.data[p+1] = 30; img.data[p+2] = 30; }
+  }
+  ctx.putImageData(img, 0, 0);
+}
+
+function render() {
+  tampered = step >= 3 ? +pick.value : -1;
+  const sh = shardsNow(), T = tree(sh);
+  const myRoot = hex(T[4][0]);
+  const found = step >= 4 ? Math.min(step - 4, 3) : -1;           // 내려간 깊이(0..3)
+  // 하강 경로 계산
+  const descent = []; let idx = 0;
+  for (let d = 4; d > 0; d--) { const left = idx * 2, same = hex(baseT[d-1][left]) === hex(T[d-1][left]); idx = same ? left + 1 : left; descent.push({level: d-1, idx}); }
+  const foundShard = tampered >= 0 ? descent[3].idx : -1;
+  const showDescent = step >= 4 && step <= 7 ? step - 3 : (step >= 8 ? 4 : 0);   // 표시할 하강 단계 수
+
+  // 타일
+  const grid = document.getElementById('grid'); grid.innerHTML = '';
+  const prfSet = new Set(); if (step === 8) prfSet.add(3);
+  for (let i = 0; i < N; i++) {
+    const t = document.createElement('div'); t.className = 'tile';
+    const isBad = i === tampered, nowH = T[0][i];
+    if (isBad) t.classList.add('bad');
+    if (step === 8 && i === 3) t.classList.add('prf');
+    if (step === 7 && i === foundShard) t.classList.add('found');
+    t.innerHTML = `<canvas width="16" height="16"></canvas><div class="no">조각 ${i}</div><div class="hs">${s6(nowH)}</div>`;
+    t.title = '클릭: 이 조각을 변조 대상으로 선택';
+    t.onclick = () => { pick.value = i; render(); };
+    grid.appendChild(t);
+    drawTile(t.querySelector('canvas'), sh[i], isBad);
+  }
+  if (step < 3) { const tiles = grid.children; Array.from(tiles).forEach((t, i) => { if (i === +pick.value && step >= 0) t.classList.add('sel'); }); }
+
+  // 트리
+  const svg = document.getElementById('svg'); let o = '';
+  const X = (d, i) => 22 + (i * 2 ** d + (2 ** d - 1) / 2) * 44, Y = d => 30 + (4 - d) * 62;
+  const showTree = step >= 1;
+  if (showTree) {
+    const pathSibs = new Set(), pathNodes = new Set(); if (step === 8) { let q = 3; for (let d = 0; d < 4; d++) { pathNodes.add(d + ':' + q); pathSibs.add(d + ':' + (q ^ 1)); q >>= 1; } pathNodes.add('4:0'); }
+    for (let d = 1; d <= 4; d++) for (let i = 0; i < T[d].length; i++) for (const k of [2*i, 2*i+1]) {
+      const ch = hex(T[d][i]) !== hex(baseT[d][i]) && hex(T[d-1][k]) !== hex(baseT[d-1][k]);
+      o += `<line x1="${X(d-1,k)}" y1="${Y(d-1)-11}" x2="${X(d,i)}" y2="${Y(d)+11}" stroke="${ch ? 'var(--bad)' : 'var(--line)'}" stroke-width="${ch ? 2.5 : 1.2}"/>`;
+    }
+    const visited = new Set(); descent.slice(0, showDescent).forEach(x => visited.add(x.level + ':' + x.idx));
+    const cmpPairs = new Set(); descent.slice(0, showDescent).forEach(x => { cmpPairs.add(x.level + ':' + (x.idx & ~1)); cmpPairs.add(x.level + ':' + (x.idx | 1)); });
+    for (let d = 0; d <= 4; d++) for (let i = 0; i < T[d].length; i++) {
+      const w = d === 0 ? 38 : 40, changed = hex(T[d][i]) !== hex(baseT[d][i]), key = d + ':' + i;
+      let fill = 'var(--node)', stroke = 'var(--line)', col = 'var(--ink)';
+      if (pathSibs.has(key)) { fill = 'var(--sib-bg)'; stroke = 'var(--sib)'; }
+      else if (pathNodes.has(key)) { fill = 'var(--hi-bg)'; stroke = 'var(--hi)'; }
+      if (changed) { fill = 'var(--bad-bg)'; stroke = 'var(--bad)'; col = 'var(--bad)'; }
+      const strong = visited.has(key) && step >= 4 && step <= 7;
+      o += `<rect x="${X(d,i)-w/2}" y="${Y(d)-11}" width="${w}" height="22" rx="5" fill="${fill}" stroke="${stroke}" stroke-width="${strong ? 3.2 : 1.5}"/>
+            <text x="${X(d,i)}" y="${Y(d)+4}" text-anchor="middle" font-size="${d===4?12:10}" fill="${col}" font-weight="${d===4?700:400}">${s6(T[d][i])}</text>`;
+    }
+    o += `<text x="2" y="${Y(4) - 16}" font-size="11" fill="var(--muted)">root</text>`;
+  } else o = `<text x="360" y="150" text-anchor="middle" font-size="16" fill="var(--muted)">2단계에서 Merkle 트리가 나타납니다</text>`;
+  svg.innerHTML = o;
+
+  // root 박스 / 판정
+  const pub = document.getElementById('pubRoot'), my = document.getElementById('myRoot'), vd = document.getElementById('verdict'), ex = document.getElementById('extra');
+  pub.innerHTML = '<h4>공개된 root (제공자 서명 후 레지스트리/체인에 게시)</h4>' + (step >= 1 ? PUB : '(아직 없음)');
+  my.className = 'rootbox'; vd.innerHTML = ''; ex.textContent = '';
+  if (step >= 2) {
+    my.innerHTML = '<h4>내가 내려받은 모델로 계산한 root</h4>' + myRoot;
+    const same = myRoot === PUB; my.classList.add(same ? 'ok' : 'bad');
+    vd.innerHTML = same ? '<div class="verdict ok">✔ 일치 — 제공자가 공개한 모델 그대로</div>' : '<div class="verdict bad">✘ 불일치 — 사용 금지 (변조됨)</div>';
+  } else my.innerHTML = '<h4>내가 내려받은 모델로 계산한 root</h4>—';
+  if (step === 3) ex.textContent = `조각 ${tampered} 의 ${FLIP_BYTE}번째 바이트, ${FLIP_BIT}번 비트 1개 (붉은 점). 파일 전체 ${N*SB} 바이트 중 1비트입니다.`;
+  if (step === 7) ex.textContent = `찾은 조각 = #${foundShard} (비교 4회 = log₂ ${N}).`;
+  if (step === 8) {
+    let c = SHA(sh[3]), q = 3, lines = [`H(조각 3) = ${s6(c)}`];
+    for (let d = 0; d < 4; d++) { const sib = baseT[d][q ^ 1], right = (q ^ 1) > q; c = right ? SHA(cat(c, sib)) : SHA(cat(sib, c)); lines.push(`${d+1}) 형제 ${s6(sib)} 와 결합 → ${s6(c)}`); q >>= 1; }
+    ex.innerHTML = lines.join('<br>') + `<br><b>계산한 root ${s6(c)} ${hex(c) === PUB ? '== 공개된 root ✔' : '≠ 공개된 root ✘'}</b>`;
+  }
+  document.getElementById('caption').innerHTML = STEPS[step];
+  document.getElementById('stepno').textContent = `단계 ${step + 1} / ${STEPS.length}`;
+  document.getElementById('prev').disabled = step === 0; document.getElementById('next').disabled = step === STEPS.length - 1;
+}
+const go = n => { step = Math.max(0, Math.min(STEPS.length - 1, n)); render(); };
+document.getElementById('next').onclick = () => go(step + 1);
+document.getElementById('prev').onclick = () => go(step - 1);
+document.getElementById('reset').onclick = () => go(0);
+pick.onchange = render;
+addEventListener('keydown', e => {
+  if (e.target === pick) return;
+  if (['Enter', ' ', 'ArrowRight'].includes(e.key)) { e.preventDefault(); go(step + 1); }
+  else if (e.key === 'ArrowLeft') go(step - 1);
+  else if (e.key === 'r' || e.key === 'R') go(0);
+});
+render();
+</script>
+</body>
+</html>
