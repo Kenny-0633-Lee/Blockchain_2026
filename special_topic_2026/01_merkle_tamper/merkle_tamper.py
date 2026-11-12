@@ -144,6 +144,46 @@ def main():
     (good if cur == big[-1][0] else bad)("증명 검증 " + ("성공" if cur == big[-1][0] else "실패"))
     say("스마트폰 지갑(SPV)이 블록 전체 없이 '내 거래가 들어갔다'를 확인하는 원리.")
 
+    step("6. 실제 비트코인 블록으로 확인 — 블록 170 (2009-01-12, 사토시 → 할 피니 첫 송금)")
+    say("지금까지는 개념용(SHA-256 1번, hex 문자열 결합). 실제 비트코인은 바이트 단위 '이중 SHA-256' + 바이트 순서 뒤집기를 쓴다.")
+    txids = ["b1fea52486ce0c62bb442b530a3f0132b826c74e473d1f2c220bfa78111c5082",
+             "f4184fc596403b9d638783cf57adfe4c75c605f6356fbc91338530e9831e9e16"]
+    header_root = "7dac2c5666815c17a3b36427de37bb9d2e2c5ccec3f8633eb91a4205cb4c10ff"
+    kv("블록 헤더의 root", header_root, width=16)
+    for i, t in enumerate(txids):
+        kv(f"txid[{i}]", t + ("   (코인베이스)" if i == 0 else "   (사토시 → 할 피니 10 BTC)"), width=16)
+    pause("Enter ▶ 계산 시작")
+    a, b = bytes.fromhex(txids[0])[::-1], bytes.fromhex(txids[1])[::-1]
+    print("  ① 화면 표기 txid 는 사람용(big-endian) → 내부 바이트 순서(little-endian)로 뒤집는다")
+    print(f"     txid[0] 내부  {a.hex()[:32]}…")
+    print(f"     txid[1] 내부  {b.hex()[:32]}…")
+    pause("Enter ▶ 이어 붙여 해시")
+    cat = a + b
+    print(f"  ② 32바이트 + 32바이트 = {len(cat)}바이트 이어 붙이기")
+    h1 = hashlib.sha256(cat).digest()
+    print(f"  ③ SHA-256 1번째   {h1.hex()[:32]}…")
+    h2 = hashlib.sha256(h1).digest()
+    print(f"  ④ SHA-256 2번째   {h2.hex()[:32]}…   (= 이중 해시 SHA256d)")
+    calc = h2[::-1].hex()
+    print(f"  ⑤ 다시 뒤집어 표기  {calc}")
+    ok = calc == header_root
+    (good if ok else bad)(f"계산한 root {'==' if ok else '≠'} 블록 헤더의 root   → " + ("실제 비트코인 블록과 일치!" if ok else "불일치"))
+    pause("Enter ▶ 한 글자만 바꿔 보기")
+    fake = txids[1][:-1] + ("0" if txids[1][-1] != "0" else "1")
+    f2 = hashlib.sha256(hashlib.sha256(a + bytes.fromhex(fake)[::-1]).digest()).digest()[::-1].hex()
+    kv("변조 txid[1]", fake[:-1] + c(fake[-1], "red", "bold") + "   (마지막 글자 1개)", width=16)
+    bad(f"새 root {f2[:24]}…  ≠  헤더 root {header_root[:24]}…")
+    genesis = "4a5e1e4baab89f3a32518a88c31bc87f618f76673e2cc77ab2127b7afdeda33b"
+    say(f"제네시스 블록은 거래가 코인베이스 1개뿐이라 root = txid = {genesis[:16]}… (잎이 1개면 그 값이 곧 root)")
+    say("잎이 홀수 개면 마지막 잎을 복제해 짝을 맞춘다 (우리 시연의 16개는 짝수라 등장하지 않음).")
+    print()
+    print(c("   구분            이 시연                 실제 Bitcoin", "dim"))
+    print("   해시            SHA-256 1번             SHA-256 2번 (SHA256d)")
+    print("   결합 방식       hex 문자열 이어붙임      32바이트 raw 이어붙임")
+    print("   바이트 순서     그대로                  내부 little-endian, 표기는 뒤집음")
+    print("   잎(leaf)        거래 문자열의 해시       txid (서명 제외 직렬화의 SHA256d)")
+    say("Ethereum 은 다르다: tx hash = keccak256(서명 포함 RLP), 블록의 transactionsRoot 는 Merkle Patricia Trie.")
+
     done("정리: 해시 하나(root)가 거래 전체를 지킨다 — 변조는 잎에서 루트까지 번지고, 증명은 log n.")
     say("브라우저 시각화: 같은 명령에 --web")
 
