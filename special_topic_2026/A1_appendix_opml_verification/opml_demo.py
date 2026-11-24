@@ -1,5 +1,5 @@
 """
-07_ai_opml_verification/opml_demo.py  (특강 2026-11-25)
+A1_appendix_opml_verification/opml_demo.py  (특강 2026-11-25)
 =======================================================
 AI 추론을 체인에서 어떻게 검증하나? — 전부 다시 계산하지 않고 '이분 탐색'과 '불시 검사'로
 
@@ -12,8 +12,8 @@ Part B. 확률적 표본 검사(Proof of Sampling 아이디어, 단순화)
 
 진행 (Enter 로 한 단계씩, a = 끝까지, q = 종료)
 실행 (저장소 루트에서, macOS 터미널 / Windows PowerShell·Git Bash 공통)
-  uv run python special_topic_2026/07_ai_opml_verification/opml_demo.py
-  uv run python special_topic_2026/07_ai_opml_verification/opml_demo.py --web     # 브라우저 시각화
+  uv run python special_topic_2026/A1_appendix_opml_verification/opml_demo.py
+  uv run python special_topic_2026/A1_appendix_opml_verification/opml_demo.py --web     # 브라우저 시각화
 옵션: --auto(멈춤 없이) --fast(애니메이션 없이)
 
 ※ 개념 시뮬레이션입니다. 실제 opML 은 MIPS VM 의 상태 Merkle root 로 이분 탐색하고, PoSP 는 스테이크·평판·중재 구조가 더 있습니다.

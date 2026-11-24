@@ -1,0 +1,223 @@
+<!doctype html>
+<html lang="ko">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>작업증명(PoW) 채굴 시각화</title>
+<style>
+  :root{
+    --bg:#f7f8fa; --card:#ffffff; --ink:#1b2430; --muted:#5b6675; --line:#c9d1db;
+    --ok:#1a8f4c; --ok-bg:#e3f5ea; --bad:#d6342c; --acc:#2457d6; --hi:#e0a100; --code:#f0f3f7;
+  }
+  @media (prefers-color-scheme: dark){
+    :root{
+      --bg:#12161c; --card:#1b212a; --ink:#e8edf3; --muted:#9aa6b5; --line:#38424f;
+      --ok:#4cc27f; --ok-bg:#16301f; --bad:#ff6b63; --acc:#6aa8ff; --hi:#ffcb3d; --code:#10141a;
+    }
+  }
+  *{box-sizing:border-box}
+  body{margin:0;background:var(--bg);color:var(--ink);
+       font-family:"Pretendard","Apple SD Gothic Neo","Malgun Gothic","Noto Sans KR",system-ui,sans-serif}
+  header{padding:18px 24px 4px}
+  h1{margin:0;font-size:28px}
+  .sub{color:var(--muted);margin-top:4px;font-size:16px}
+  .bar{display:flex;gap:10px;align-items:center;padding:10px 24px;flex-wrap:wrap}
+  .lbl{color:var(--muted);font-size:16px;margin-right:2px}
+  button,select{font:inherit;font-size:18px;padding:9px 16px;border-radius:10px;border:1px solid var(--line);background:var(--card);color:var(--ink);cursor:pointer}
+  button.on{background:var(--acc);color:#fff;border-color:var(--acc)}
+  button.go{background:var(--ok);color:#fff;border-color:var(--ok);font-weight:700}
+  .wrap{display:flex;gap:16px;padding:6px 24px 24px;flex-wrap:wrap;align-items:flex-start}
+  .card{background:var(--card);border:1px solid var(--line);border-radius:12px;padding:14px 16px}
+  .left{flex:1 1 640px;min-width:320px}.right{flex:1 1 460px;min-width:320px}
+  h2{margin:0 0 8px;font-size:19px}
+  .mono{font-family:ui-monospace,Menlo,Consolas,monospace}
+  #stream{background:var(--code);border-radius:10px;padding:10px 12px;font-size:17px;line-height:1.55;height:calc(1.55em*14 + 20px);overflow:hidden;white-space:nowrap}
+  .row{display:flex;gap:10px}.row .n{color:var(--muted);width:15ch;text-align:right;flex:none}
+  .row .m{width:1.4em;flex:none;color:var(--bad)}
+  .z{color:var(--ok);font-weight:800}
+  .row.hit{background:var(--ok-bg);border-radius:6px}.row.hit .m{color:var(--ok)}
+  .stats{display:grid;grid-template-columns:repeat(4,1fr);gap:10px;margin-top:12px}
+  .stat{background:var(--code);border-radius:10px;padding:8px 10px}
+  .stat .k{color:var(--muted);font-size:14px}.stat .v{font-size:24px;font-weight:700}
+  .prog{height:22px;background:var(--code);border-radius:11px;overflow:hidden;margin-top:12px;position:relative}
+  .prog i{display:block;height:100%;width:0;background:var(--acc)}
+  .progtxt{font-size:15px;color:var(--muted);margin-top:4px}
+  #verify{margin-top:10px;min-height:56px;font-size:18px;line-height:1.5}
+  .okmsg{color:var(--ok);font-weight:700}
+  .crow{display:grid;grid-template-columns:70px 1fr 210px;gap:10px;align-items:center;margin:10px 0}
+  .track{height:28px;background:var(--code);border-radius:6px;position:relative}
+  .fill{height:100%;background:var(--acc);border-radius:6px;width:0}
+  .tick{position:absolute;top:-4px;bottom:-4px;width:3px;background:var(--hi)}
+  .cv{font-size:16px;text-align:right;white-space:nowrap}
+  .note{color:var(--muted);font-size:15px;margin-top:8px;line-height:1.5}
+  .legend i{display:inline-block;width:12px;height:12px;vertical-align:middle;margin:0 4px 0 10px;border-radius:3px}
+</style>
+</head>
+<body>
+<header>
+  <h1>작업증명(PoW): 해시를 수없이 계산해서 찾는다</h1>
+  <div class="sub">입력 = <span class="mono">genesis | Alice-&gt;Bob 1BTC #난이도 | nonce</span> &nbsp;→ SHA-256 &nbsp;·&nbsp; 터미널 시연과 같은 입력이라 같은 nonce가 나옵니다</div>
+</header>
+
+<div class="bar">
+  <span class="lbl">난이도 (앞자리 0의 개수)</span>
+  <span id="dbtns"></span>
+  <span class="lbl" style="margin-left:14px">속도</span>
+  <select id="speed">
+    <option value="paced">연출 (약 3초)</option>
+    <option value="slow">슬로모션</option>
+    <option value="max">최대 속도</option>
+  </select>
+  <button class="go" id="go">▶ 채굴 시작</button>
+  <button id="stop">■ 정지</button>
+  <button id="reset">기록 지우기</button>
+</div>
+
+<div class="wrap">
+  <div class="card left">
+    <h2>해시 스트림 &mdash; nonce를 올릴 때마다 해시를 새로 계산</h2>
+    <div id="stream" class="mono"></div>
+    <div class="stats">
+      <div class="stat"><div class="k">누적 시도</div><div class="v mono" id="sTry">0</div></div>
+      <div class="stat"><div class="k">초당 해시</div><div class="v mono" id="sRate">0</div></div>
+      <div class="stat"><div class="k">경과</div><div class="v mono" id="sTime">0.00 s</div></div>
+      <div class="stat"><div class="k">기대 시도 16<sup id="sD">1</sup></div><div class="v mono" id="sExp">16</div></div>
+    </div>
+    <div class="prog"><i id="pbar"></i></div>
+    <div class="progtxt" id="ptxt">기대값 대비 진행률</div>
+    <div id="verify"></div>
+  </div>
+
+  <div class="card right">
+    <h2>난이도별 시도 횟수 &mdash; 한 자리마다 약 16배</h2>
+    <div class="legend note" style="margin:0 0 4px"><i style="background:var(--acc)"></i>이번 채굴 시도 횟수<i style="background:var(--hi)"></i>기대값 16<sup>d</sup>
+      &nbsp; <label><input type="checkbox" id="logscale" checked> 로그 눈금</label></div>
+    <div id="chart"></div>
+    <div class="note">막대는 난이도 1~5를 같은 눈금(기본: 로그)으로 그려서, 한 칸 올릴 때마다 같은 간격(×16)으로 늘어납니다. 로그 눈금을 끄면 실제 길이 비율이 보입니다. 같은 난이도를 여러 번 하면 평균이 기대값에 가까워집니다 (운이 좋으면 한 번에 맞기도 합니다). 검증은 해시 1번이면 끝납니다.</div>
+  </div>
+</div>
+
+<script>
+// ---- SHA-256 (동기, ASCII 입력) ----
+const K=new Uint32Array([0x428a2f98,0x71374491,0xb5c0fbcf,0xe9b5dba5,0x3956c25b,0x59f111f1,0x923f82a4,0xab1c5ed5,0xd807aa98,0x12835b01,0x243185be,0x550c7dc3,0x72be5d74,0x80deb1fe,0x9bdc06a7,0xc19bf174,0xe49b69c1,0xefbe4786,0x0fc19dc6,0x240ca1cc,0x2de92c6f,0x4a7484aa,0x5cb0a9dc,0x76f988da,0x983e5152,0xa831c66d,0xb00327c8,0xbf597fc7,0xc6e00bf3,0xd5a79147,0x06ca6351,0x14292967,0x27b70a85,0x2e1b2138,0x4d2c6dfc,0x53380d13,0x650a7354,0x766a0abb,0x81c2c92e,0x92722c85,0xa2bfe8a1,0xa81a664b,0xc24b8b70,0xc76c51a3,0xd192e819,0xd6990624,0xf40e3585,0x106aa070,0x19a4c116,0x1e376c08,0x2748774c,0x34b0bcb5,0x391c0cb3,0x4ed8aa4a,0x5b9cca4f,0x682e6ff3,0x748f82ee,0x78a5636f,0x84c87814,0x8cc70208,0x90befffa,0xa4506ceb,0xbef9a3f7,0xc67178f2]);
+const W=new Uint32Array(64), H0=[0x6a09e667,0xbb67ae85,0x3c6ef372,0xa54ff53a,0x510e527f,0x9b05688c,0x1f83d9ab,0x5be0cd19];
+const HEX=[];for(let i=0;i<256;i++)HEX.push((i+256).toString(16).slice(1));
+function sha256(str){
+  const n=str.length, total=((n+9+63)>>6)<<6, m=new Uint8Array(total);
+  for(let i=0;i<n;i++)m[i]=str.charCodeAt(i);
+  m[n]=0x80; const bits=n*8; m[total-4]=bits>>>24; m[total-3]=bits>>>16; m[total-2]=bits>>>8; m[total-1]=bits;
+  let h0=H0[0],h1=H0[1],h2=H0[2],h3=H0[3],h4=H0[4],h5=H0[5],h6=H0[6],h7=H0[7];
+  for(let o=0;o<total;o+=64){
+    for(let i=0;i<16;i++)W[i]=(m[o+4*i]<<24)|(m[o+4*i+1]<<16)|(m[o+4*i+2]<<8)|m[o+4*i+3];
+    for(let i=16;i<64;i++){
+      const a=W[i-15],b=W[i-2];
+      const s0=((a>>>7)|(a<<25))^((a>>>18)|(a<<14))^(a>>>3);
+      const s1=((b>>>17)|(b<<15))^((b>>>19)|(b<<13))^(b>>>10);
+      W[i]=(W[i-16]+s0+W[i-7]+s1)|0;
+    }
+    let a=h0,b=h1,c=h2,d=h3,e=h4,f=h5,g=h6,h=h7;
+    for(let i=0;i<64;i++){
+      const S1=((e>>>6)|(e<<26))^((e>>>11)|(e<<21))^((e>>>25)|(e<<7));
+      const ch=(e&f)^(~e&g);
+      const t1=(h+S1+ch+K[i]+W[i])|0;
+      const S0=((a>>>2)|(a<<30))^((a>>>13)|(a<<19))^((a>>>22)|(a<<10));
+      const mj=(a&b)^(a&c)^(b&c);
+      const t2=(S0+mj)|0;
+      h=g;g=f;f=e;e=(d+t1)|0;d=c;c=b;b=a;a=(t1+t2)|0;
+    }
+    h0=(h0+a)|0;h1=(h1+b)|0;h2=(h2+c)|0;h3=(h3+d)|0;h4=(h4+e)|0;h5=(h5+f)|0;h6=(h6+g)|0;h7=(h7+h)|0;
+  }
+  let out="";for(const v of [h0,h1,h2,h3,h4,h5,h6,h7])out+=HEX[v>>>24]+HEX[(v>>>16)&255]+HEX[(v>>>8)&255]+HEX[v&255];
+  return out;
+}
+// ---- 상태 ----
+const MAXD=5, ROWS=14, $=id=>document.getElementById(id);
+let diff=4, running=false, nonce=0, startT=0, lastT=0, carry=0, recent=[], runCount={}, runs={}, current=null, rateWin=[];
+const fmt=x=>Math.round(x).toLocaleString("en-US");
+const dataFor=d=>{const k=runCount[d]||0; return "Alice->Bob 1BTC #"+d+(k?("-"+k):"");};
+const input=(d,n)=>"genesis|"+dataFor(d)+"|"+n;
+function zhl(hex,d,len){ // 앞자리 0 강조
+  let z=0; while(z<d&&hex[z]==="0")z++;
+  return (z?'<span class="z">'+hex.slice(0,z)+'</span>':"")+hex.slice(z,len);
+}
+function renderStream(hitIdx){
+  $("stream").innerHTML=recent.map((r,i)=>{
+    const hit=i===hitIdx;
+    return '<div class="row'+(hit?" hit":"")+'"><span class="n">nonce '+fmt(r.n)+'</span><span class="m">'+(hit?"✔":"✘")+'</span><span>'+zhl(r.h,diff,44)+'…</span></div>';
+  }).join("");
+}
+function buildUI(){
+  const b=$("dbtns"); b.innerHTML="";
+  for(let d=1;d<=MAXD;d++){const x=document.createElement("button");x.textContent=d;x.dataset.d=d;x.style.marginRight="6px";x.onclick=()=>{if(!running){diff=d;syncUI();}};b.appendChild(x);}
+  const ch=$("chart"); ch.innerHTML="";
+  for(let d=1;d<=MAXD;d++){
+    ch.insertAdjacentHTML("beforeend",'<div class="crow"><div>난이도 '+d+'</div><div class="track"><div class="fill" id="f'+d+'"></div><div class="tick" id="t'+d+'"></div></div><div class="cv mono" id="v'+d+'">–</div></div>');
+  }
+  syncUI();
+}
+function scale(v){ // 0~1
+  const top=Math.pow(16,MAXD);
+  if($("logscale").checked) return Math.log10(Math.max(v,1))/Math.log10(top);
+  return Math.min(v/top,1);
+}
+function drawChart(){
+  for(let d=1;d<=MAXD;d++){
+    const arr=runs[d]||[], last=arr.length?arr[arr.length-1]:0, avg=arr.length?arr.reduce((a,b)=>a+b,0)/arr.length:0;
+    $("f"+d).style.width=(arr.length?Math.max(scale(last)*100,0.6):0)+"%";
+    $("t"+d).style.left="calc("+(scale(Math.pow(16,d))*100)+"% - 1px)";
+    $("v"+d).innerHTML=arr.length?(fmt(last)+'회<br><span style="color:var(--muted)">평균 '+fmt(avg)+' · '+arr.length+'회</span>'):"–";
+  }
+}
+function syncUI(){
+  document.querySelectorAll("#dbtns button").forEach(b=>b.classList.toggle("on",+b.dataset.d===diff));
+  $("sD").textContent=diff; $("sExp").textContent=fmt(Math.pow(16,diff));
+  $("go").disabled=running; $("stop").disabled=!running; $("speed").disabled=running;
+  document.querySelectorAll("#dbtns button").forEach(b=>b.disabled=running);
+}
+function start(){
+  nonce=0; recent=[]; carry=0; rateWin=[]; running=true; current={d:diff};
+  startT=lastT=performance.now(); $("verify").innerHTML=""; syncUI(); renderStream(-1);
+  requestAnimationFrame(tick);
+}
+function stop(){running=false;syncUI();}
+function tick(now){
+  if(!running)return;
+  const d=diff, target="0".repeat(d), expected=Math.pow(16,d), mode=$("speed").value;
+  const dt=Math.min((now-lastT)/1000,0.1); lastT=now;
+  let budget;
+  if(mode==="max") budget=Infinity;
+  else{ const rate=mode==="slow"?Math.max(2,expected/12):expected/3; carry+=rate*dt; budget=Math.floor(carry); carry-=budget; }
+  const t0=performance.now(); let hit=-1, did=0;
+  while(did<budget){
+    const hx=sha256(input(d,nonce));
+    recent.push({n:nonce,h:hx}); if(recent.length>ROWS)recent.shift();
+    did++;
+    if(hx.startsWith(target)){hit=recent.length-1;break;}
+    nonce++;
+    if(mode==="max"&&did%64===0&&performance.now()-t0>18)break;
+  }
+  const el=(now-startT)/1000, n=nonce+(hit>=0?1:0);
+  rateWin.push([now,n]); while(rateWin.length>1&&now-rateWin[0][0]>1000)rateWin.shift();
+  const w=rateWin[0], rps=rateWin.length>1?(n-w[1])/((now-w[0])/1000):0;
+  $("sTry").textContent=fmt(n); $("sRate").textContent=rps>=1e6?(rps/1e6).toFixed(2)+" MH/s":rps>=1e3?fmt(rps/1e3)+" kH/s":fmt(rps)+" H/s";
+  $("sTime").textContent=el.toFixed(2)+" s";
+  $("pbar").style.width=Math.min(n/expected*100,100)+"%";
+  $("ptxt").textContent="기대값 "+fmt(expected)+"회 대비 "+fmt(n/expected*100)+"%";
+  renderStream(hit);
+  if(hit>=0){
+    running=false;
+    const chk=sha256(input(d,recent[hit].n));   // 검증: 해시 1번 (runCount 를 올리기 전에)
+    (runs[d]=runs[d]||[]).push(n); runCount[d]=(runCount[d]||0)+1;
+    $("verify").innerHTML='<span class="okmsg">✔ 찾았다!</span> nonce='+fmt(recent[hit].n)+' &nbsp;<b>검증은 해시 1번</b>: <span class="mono">'+zhl(chk,d,24)+'…</span> (앞 '+d+'자리가 0) <span style="color:var(--muted)">— 찾는 데 '+fmt(n)+'번, 확인은 1번</span>';
+    syncUI(); drawChart(); return;
+  }
+  drawChart();
+  requestAnimationFrame(tick);
+}
+$("go").onclick=start; $("stop").onclick=stop;
+$("reset").onclick=()=>{if(running)return;runs={};runCount={};$("verify").innerHTML="";$("sTry").textContent="0";$("sRate").textContent="0";$("sTime").textContent="0.00 s";$("pbar").style.width="0";recent=[];renderStream(-1);drawChart();};
+$("logscale").onchange=drawChart;
+buildUI(); drawChart(); renderStream(-1);
+</script>
+</body>
+</html>

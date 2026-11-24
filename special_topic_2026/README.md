@@ -8,12 +8,13 @@
 | 폴더 | 파일 | 보여주는 것 | 의존성 | 시간 |
 |---|---|---|---|---|
 | `01_merkle_tamper` | `merkle_tamper.py` | 변조가 루트까지 번지는 모습, 포함 증명 log₂n | 표준 라이브러리 | 약 2분 (+ `--web`) |
-| `02_pow_mining` | `pow_demo.py` | 난이도별 채굴(×16), 과거 블록 변조 비용 | 표준 라이브러리 | 약 1분 (Enter 진행) |
+| `02_pow_mining` | `pow_demo_v2.py` (원본 `pow_demo.py` 유지) | 해시 스트림, 난이도별 채굴(×16) 막대, 초당 해시 속도, 과거 블록 변조 비용 | 표준 라이브러리 | 약 1분 (Enter 진행) (+ `--web`, `--real`) |
 | `03_bip39_wallet` | `bip39_demo.py` | 12단어 → 시드 → 키 → BTC/ETH 주소 | `bip-utils` | 1초 |
 | `04_sre_nft_mint` | (README만) | Scaffold-ETH 2 로 NFT 민팅 | Node ≥ 20.18.3, Yarn | 사전 리허설 필수 |
 | `05_did_mobile_id` | `did_demo.py` | 모바일 신분증(DID/VC) 개념: 허가형 원장, 공격 5종, 선택적 공개 | `cryptography` | 1초 |
 | `06_ai_model_provenance` | `model_provenance.py` | AI 모델 가중치 Merkle root 서명, 1비트 변조 적발, 이력 해시 체인 | `cryptography` | 약 3분 (+ `--web`) |
-| `07_ai_opml_verification` | `opml_demo.py` | opML 이분 탐색(10회 비교로 1,024단계 중 조작 적발), 불시 검사 손익분기 | 표준 라이브러리 | 약 3분 (+ `--web`) |
+| `07_ai_content_provenance` | `provenance_demo.py` | 딥페이크 대응 출처 증명(C2PA 방식): 서명 매니페스트, 편집 이력 해시 체인, 1픽셀 변조·무서명·위조 서명 공격, 'AI 생성' 선언, 블록체인 앵커링, 한계 | 표준 라이브러리 (ECDSA P-256 직접 구현) | 약 4분 (+ `--web`) |
+| `A1_appendix_opml_verification` | `opml_demo.py` | **[부록]** opML 이분 탐색(10회 비교로 1,024단계 중 조작 적발), 불시 검사 손익분기 | 표준 라이브러리 | 약 3분 (+ `--web`) |
 
 ## 실행 (저장소 루트에서)
 
@@ -45,7 +46,7 @@ uv run python special_topic_2026/01_merkle_tamper/merkle_tamper.py
 |---|---|
 | `--auto` | 멈춤 없이 실행 (리허설·점검용) |
 | `--fast` | 애니메이션 지연 없이 |
-| `--web` | 브라우저 시각화 열기 (`01`, `06`, `07`) |
+| `--web` | 브라우저 시각화 열기 (`01`, `06`, `07`, `A1`) |
 
 출력을 파이프/파일로 보내면 자동으로 `--auto --fast` 가 적용됩니다.
 
@@ -55,7 +56,8 @@ uv run python special_topic_2026/01_merkle_tamper/merkle_tamper.py
 |---|---|
 | `01_merkle_tamper/merkle_viz.html` | Merkle 트리 단계별 구성, 클릭한 리프 변조 → 붉은 경로, 증명 경로 |
 | `06_ai_model_provenance/provenance_viz.html` | 모델 16조각 + 트리, 1비트 변조, 4번 비교로 조각 찾기, 증명 경로 |
-| `07_ai_opml_verification/opml_viz.html` | A) 1,024단계 격자 이분 탐색 B) 불시 검사 손익 슬라이더·10,000건 시뮬레이션 |
+| `07_ai_content_provenance/provenance_viz.html` | 시나리오 6종(원본·편집·딥페이크·위조·AI 선언·메타데이터 제거), 픽셀 클릭 변조 → 해시 차이·검증 체크리스트·판정 배지, 블록체인 앵커 |
+| `A1_appendix_opml_verification/opml_viz.html` | A) 1,024단계 격자 이분 탐색 B) 불시 검사 손익 슬라이더·10,000건 시뮬레이션 |
 
 키: Space/Enter/→ 다음, ← 이전, R 처음부터. 파일을 더블클릭해도 열립니다.
 
@@ -63,5 +65,6 @@ uv run python special_topic_2026/01_merkle_tamper/merkle_tamper.py
 
 - 모든 코드는 **교육용 개념 시뮬레이션**입니다. 특히 `05`는 실제 모바일 신분증(OmniOne OpenDID 등)의 내부 구현과 같다고 주장하지 않으며, DID 이름은 예시입니다.
 - `06`의 '모델 가중치'는 시연용 난수 바이트입니다.
-- `07`은 opML/Proof of Sampling의 핵심 아이디어를 단순화한 것입니다.
+- `07`은 C2PA의 핵심 원리(서명 매니페스트·신뢰 목록·편집 이력)를 단순화한 것이며, 실제 C2PA는 JUMBF/COSE·X.509 인증서 체인을 씁니다. 서명 난수를 결정적으로 만든 교육용 구현이므로 실서비스에 쓰지 마세요.
+- `A1`(부록)은 opML/Proof of Sampling의 핵심 아이디어를 단순화한 것입니다.
 - `03`이 만드는 니모닉에 실제 자산을 넣지 마세요.
