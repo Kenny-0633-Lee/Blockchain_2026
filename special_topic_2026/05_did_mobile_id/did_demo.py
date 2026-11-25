@@ -17,7 +17,8 @@ did_demo.py - 모바일 신분증(DID/VC) 구조 시뮬레이션 (교육용 개�
 
 실행 (저장소 루트에서, macOS 터미널 / Windows PowerShell·Git Bash 공통)
     uv run python special_topic_2026/05_did_mobile_id/did_demo.py
-옵션: --auto(멈춤 없이) --fast(애니메이션 없이)
+    uv run python special_topic_2026/05_did_mobile_id/did_demo.py --web     # 브라우저 시각화 (같은 시나리오)
+옵션: --auto(멈춤 없이) --fast(애니메이션 없이) --web(브라우저)
 """
 import base64
 import hashlib
@@ -32,7 +33,8 @@ from cryptography.hazmat.primitives import hashes, serialization
 from cryptography.hazmat.primitives.asymmetric import ec
 
 sys.path.insert(0, str(Path(__file__).resolve().parents[1]))
-from _common.demo_kit import (bad, c, done, good, kv, line, pause, say, sleep, step, title)
+from _common.demo_kit import (bad, c, done, good, kv, line, open_web, pause, say, sleep, step, title,
+                              wants_web)
 
 
 # ---------------------------------------------------------------- 유틸
@@ -283,6 +285,9 @@ def verdict(ok, failed=None):
 
 # ---------------------------------------------------------------- 시연
 def main():
+    if wants_web():
+        open_web(Path(__file__).with_name("did_viz.html"))
+        return
     t0 = time.time()
     title("모바일 신분증(DID/VC) — 코인이 아닌 블록체인")
     say("체인에 있는 것: DID → 공개키, 폐지 기록 / 폰에 있는 것: 신분증 내용 + 개인키")
@@ -401,6 +406,7 @@ def main():
 
     done("정리: 체인 = 위조 불가능한 공개키 명부 + 폐지 목록 / 개인정보 = 폰 / 검증 = 원장 조회 + 서명·해시 확인")
     say(f"(총 실행 시간 {time.time() - t0:.1f}s, 대부분은 Enter 대기)")
+    say("브라우저 시각화: 같은 명령에 --web")
 
 
 if __name__ == "__main__":

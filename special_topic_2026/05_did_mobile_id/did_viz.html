@@ -1,0 +1,171 @@
+<!doctype html>
+<html lang="ko"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>모바일 신분증(DID/VC) 시각화 — 특강 시연 ⑤</title>
+<style>
+:root{--bg:#0f1b2d;--card:#17263d;--ink:#e8eef7;--dim:#8fa3bf;--ok:#3ecf8e;--bad:#ff6b6b;--warn:#f5c04a;--acc:#4cc9f0;--org:#ff9f43;--line:#2a3d5c}
+*{box-sizing:border-box}body{margin:0;background:var(--bg);color:var(--ink);font:15px/1.5 -apple-system,"Apple SD Gothic Neo","Malgun Gothic",sans-serif}
+header{padding:12px 22px;border-bottom:1px solid var(--line)}h1{margin:0;font-size:20px}header p{margin:2px 0 0;color:var(--dim);font-size:13px}
+#bar{display:flex;flex-wrap:wrap;gap:6px;padding:10px 22px;align-items:center;border-bottom:1px solid var(--line)}
+button{background:#22365a;color:var(--ink);border:1px solid var(--line);border-radius:8px;padding:7px 11px;cursor:pointer;font:inherit;font-size:13px}button:hover{background:#2c4673}
+button.on{background:#0f3342;border-color:var(--acc);color:var(--acc);font-weight:700}button.atk{border-color:#5a2a2a}button.atk.on{background:#4a1d1d;border-color:var(--bad);color:var(--bad)}
+main{display:grid;grid-template-columns:minmax(0,1.25fr) minmax(0,1fr);gap:14px;padding:14px 22px}@media(max-width:1000px){main{grid-template-columns:1fr}}
+.card{background:var(--card);border:1px solid var(--line);border-radius:12px;padding:12px 14px}h2{margin:0 0 6px;font-size:13px;color:var(--dim);font-weight:600}
+.grid{display:grid;grid-template-columns:1fr 1fr;gap:12px}@media(max-width:700px){.grid{grid-template-columns:1fr}}
+.who{font-weight:700;margin-bottom:2px}.mono{font:12px ui-monospace,Menlo,Consolas,monospace;color:#b8c7de;word-break:break-all}.dim{color:var(--dim)}
+.chips{display:flex;flex-wrap:wrap;gap:5px;margin:4px 0}.chip{border:1px solid var(--line);border-radius:999px;padding:2px 9px;font-size:12px;background:#12203a}
+.chain{display:flex;gap:7px;overflow-x:auto;padding:4px 0}.blk{min-width:150px;border:1px solid var(--line);border-radius:8px;padding:6px 8px;background:#12203a;font-size:12px}
+.blk.new{border-color:var(--acc);box-shadow:0 0 0 1px var(--acc)}.blk.t{border-color:var(--bad);background:#3a1a1f}.blk .ty{color:var(--org);font-weight:700}
+.dots i{display:inline-block;width:8px;height:8px;border-radius:50%;background:var(--ok);margin-right:3px}
+table{width:100%;border-collapse:collapse;font-size:13px}td,th{padding:3px 6px;border-bottom:1px solid var(--line);text-align:left;vertical-align:top}th{color:var(--dim);font-weight:600}
+.show{color:var(--ok);font-weight:700}.hide{color:var(--dim)}.red{color:var(--bad);font-weight:700}
+.chk{display:flex;gap:8px;padding:5px 0;border-bottom:1px solid #1f3150;opacity:0;transition:opacity .25s}.chk.v{opacity:1}.chk b{width:20px;text-align:center}
+.ok{color:var(--ok)}.no{color:var(--bad)}.sk{color:var(--dim)}.det{font-size:12px;color:var(--dim)}.why{font-size:12px;color:var(--bad)}
+.verdict{display:inline-block;margin-top:8px;padding:8px 16px;border-radius:999px;font-weight:700;font-size:16px;opacity:0;transition:opacity .3s}.verdict.v{opacity:1}
+.va{background:#12392b;color:var(--ok)}.vr{background:#4a1d1d;color:var(--bad)}
+.say{color:var(--dim);font-size:14px;margin:4px 0}.flow{font-size:13px;margin:2px 0}.flow b{color:var(--acc)}
+#banner{display:none;background:#4a3b13;color:var(--warn);padding:6px 22px;font-size:13px}
+.title{font-size:17px;font-weight:700;margin:0 0 4px}
+</style></head><body>
+<header><h1>모바일 신분증(DID/VC) — 코인이 아닌 블록체인</h1>
+<p>체인에 있는 것: DID → 공개키, 폐지 기록 / 폰에 있는 것: 신분증 내용 + 개인키. 터미널 시연과 같은 순서입니다. (Space · → 다음, ← 이전, R 처음부터)</p></header>
+<div id="banner">이 브라우저에서는 WebCrypto 를 쓸 수 없어 서명을 해시로 대체한 시뮬레이션으로 동작합니다.</div>
+<div id="bar"></div>
+<main>
+<section>
+ <div class="card"><div class="title" id="ttl">준비 중…</div><div id="say"></div><div id="flow"></div></div>
+ <div style="height:12px"></div>
+ <div class="card"><h2>허가형 원장 (인가된 노드 4개, 블록은 3개 이상 서명해야 유효)</h2><div class="chips" id="nodes"></div><div class="chain" id="chain"></div></div>
+ <div style="height:12px"></div>
+ <div class="grid">
+  <div class="card"><h2>발급기관 (경찰청 역할)</h2><div id="issuer"></div></div>
+  <div class="card"><h2>검증자</h2><div id="verifier"></div></div>
+ </div>
+ <div style="height:12px"></div>
+ <div class="card"><h2>지갑 (홀더의 폰) — 신분증 내용은 체인이 아니라 여기에만 있다</h2><div id="wallet"></div></div>
+</section>
+<section>
+ <div class="card"><h2>검증 결과 (검증자가 하나씩 확인)</h2><div id="checks"></div><div id="verdict"></div><div class="det" id="note"></div></div>
+ <div style="height:12px"></div>
+ <div class="card" id="extra" style="display:none"></div>
+</section>
+</main>
+<script>
+"use strict";
+const enc=new TextEncoder();
+const K=new Uint32Array([0x428a2f98,0x71374491,0xb5c0fbcf,0xe9b5dba5,0x3956c25b,0x59f111f1,0x923f82a4,0xab1c5ed5,0xd807aa98,0x12835b01,0x243185be,0x550c7dc3,0x72be5d74,0x80deb1fe,0x9bdc06a7,0xc19bf174,0xe49b69c1,0xefbe4786,0x0fc19dc6,0x240ca1cc,0x2de92c6f,0x4a7484aa,0x5cb0a9dc,0x76f988da,0x983e5152,0xa831c66d,0xb00327c8,0xbf597fc7,0xc6e00bf3,0xd5a79147,0x06ca6351,0x14292967,0x27b70a85,0x2e1b2138,0x4d2c6dfc,0x53380d13,0x650a7354,0x766a0abb,0x81c2c92e,0x92722c85,0xa2bfe8a1,0xa81a664b,0xc24b8b70,0xc76c51a3,0xd192e819,0xd6990624,0xf40e3585,0x106aa070,0x19a4c116,0x1e376c08,0x2748774c,0x34b0bcb5,0x391c0cb3,0x4ed8aa4a,0x5b9cca4f,0x682e6ff3,0x748f82ee,0x78a5636f,0x84c87814,0x8cc70208,0x90befffa,0xa4506ceb,0xbef9a3f7,0xc67178f2]);
+function sha256(bytes){const l=bytes.length,n=((l+9+63)>>6)<<6,b=new Uint8Array(n);b.set(bytes);b[l]=0x80;const dv=new DataView(b.buffer);dv.setUint32(n-8,Math.floor(l*8/4294967296));dv.setUint32(n-4,(l*8)>>>0);
+ let h=new Uint32Array([0x6a09e667,0xbb67ae85,0x3c6ef372,0xa54ff53a,0x510e527f,0x9b05688c,0x1f83d9ab,0x5be0cd19]);const w=new Uint32Array(64);const R=(x,k)=>(x>>>k)|(x<<(32-k));
+ for(let o=0;o<n;o+=64){for(let i=0;i<16;i++)w[i]=dv.getUint32(o+i*4);for(let i=16;i<64;i++){const s0=R(w[i-15],7)^R(w[i-15],18)^(w[i-15]>>>3),s1=R(w[i-2],17)^R(w[i-2],19)^(w[i-2]>>>10);w[i]=(w[i-16]+s0+w[i-7]+s1)|0}
+  let [a,b2,c,d,e,f,g,hh]=h;for(let i=0;i<64;i++){const S1=R(e,6)^R(e,11)^R(e,25),ch=(e&f)^(~e&g),t1=(hh+S1+ch+K[i]+w[i])|0,S0=R(a,2)^R(a,13)^R(a,22),mj=(a&b2)^(a&c)^(b2&c),t2=(S0+mj)|0;hh=g;g=f;f=e;e=(d+t1)|0;d=c;c=b2;b2=a;a=(t1+t2)|0}
+  h[0]+=a;h[1]+=b2;h[2]+=c;h[3]+=d;h[4]+=e;h[5]+=f;h[6]+=g;h[7]+=hh}
+ return [...h].map(x=>(x>>>0).toString(16).padStart(8,"0")).join("")}
+const sha=s=>sha256(enc.encode(s));
+function canon(o){if(Array.isArray(o))return"["+o.map(canon).join(",")+"]";if(o&&typeof o==="object")return"{"+Object.keys(o).sort().map(k=>JSON.stringify(k)+":"+canon(o[k])).join(",")+"}";return JSON.stringify(o)}
+const b64=u=>btoa(String.fromCharCode(...u)),unb64=s=>Uint8Array.from(atob(s),c=>c.charCodeAt(0));
+const rnd=n=>{const a=new Uint8Array(n);(crypto&&crypto.getRandomValues)?crypto.getRandomValues(a):a.forEach((_,i)=>a[i]=Math.random()*256);return a};
+const short=(s,n=12)=>s.slice(0,n)+"…";
+/* ── 키 · 서명 ── */
+let REAL=!!(window.crypto&&crypto.subtle);const REG={};
+async function newKey(){if(REAL){try{const kp=await crypto.subtle.generateKey({name:"ECDSA",namedCurve:"P-256"},true,["sign","verify"]);return{priv:kp.privateKey,pub:b64(new Uint8Array(await crypto.subtle.exportKey("raw",kp.publicKey)))}}catch(e){REAL=false}}
+ const secret=b64(rnd(16)),pub=sha(secret);REG[pub]=secret;return{priv:secret,pub}}
+async function sign(k,msg){if(REAL)return b64(new Uint8Array(await crypto.subtle.sign({name:"ECDSA",hash:"SHA-256"},k.priv,enc.encode(msg))));return sha(k.priv+"|"+msg)}
+async function verify(pub,msg,sig){if(REAL){try{const pk=await crypto.subtle.importKey("raw",unb64(pub),{name:"ECDSA",namedCurve:"P-256"},false,["verify"]);return await crypto.subtle.verify({name:"ECDSA",hash:"SHA-256"},pk,unb64(sig),enc.encode(msg))}catch(e){return false}}
+ return REG[pub]!==undefined&&sha(REG[pub]+"|"+msg)===sig}
+const fp=pub=>sha(pub).slice(0,10);
+/* ── 허가형 원장 ── */
+class Ledger{async init(){this.keys=[];for(let i=0;i<4;i++)this.keys.push(await newKey());this.pubs={};this.keys.forEach((k,i)=>this.pubs["node"+(i+1)]=k.pub);this.quorum=3;this.chain=[];await this.append([{type:"GENESIS"}])}
+ async append(txs){const prev=this.chain.length?this.chain[this.chain.length-1].hash:"0".repeat(64),body={height:this.chain.length,prev,txs},h=sha(canon(body)),sigs={};
+  for(let i=0;i<4;i++)sigs["node"+(i+1)]=await sign(this.keys[i],h);this.chain.push({...body,hash:h,sigs})}
+ async validate(chain=this.chain){let prev="0".repeat(64);for(const b of chain){const body={height:b.height,prev:b.prev,txs:b.txs};
+   if(b.prev!==prev)return[false,`블록 ${b.height}: 이전 해시 연결이 끊김`];const rc=sha(canon(body));
+   if(rc!==b.hash)return[false,`블록 ${b.height}: 내용이 바뀜 (기록된 해시 ${short(b.hash,8)} ≠ 다시 계산한 해시 ${short(rc,8)})`];
+   let g=0;for(const [n,s] of Object.entries(b.sigs))if(this.pubs[n]&&await verify(this.pubs[n],b.hash,s))g++;
+   if(g<this.quorum)return[false,`블록 ${b.height}: 유효 서명 ${g} < quorum ${this.quorum}`];prev=b.hash}
+  return[true,`체인 ${chain.length}개 블록 전체 유효 (해시 연결 + 노드 서명)`]}
+ resolve(did,chain=this.chain){let k=null;for(const b of chain)for(const t of b.txs)if(t.type==="REGISTER_DID"&&t.did===did)k=t.pubkey;return k}
+ isRevoked(id,chain=this.chain){for(const b of chain)for(const t of b.txs)if(t.type==="REVOKE"&&t.status_id===id)return true;return false}}
+/* ── 발급자 · 홀더 · 검증자 ── */
+async function issue(issuer,holderDid,holderPub,claims){const salts={},digests={};for(const k in claims){salts[k]=b64(rnd(16));digests[k]=sha(canon([salts[k],k,claims[k]]))}
+ const vc={issuer:issuer.did,holder:holderDid,holder_pub:holderPub,digests,status_id:sha(b64(rnd(16))).slice(0,16)};vc.sig=await sign(issuer.key,canon(vc));return{vc,salts}}
+async function present(w,nonce,domain,disclose){const reveal={};disclose.forEach(k=>reveal[k]=[w.salts[k],w.claims[k]]);const proof={nonce,domain,vc_hash:sha(canon(w.vc))};return{vc:w.vc,reveal,proof,holder_sig:await sign(w.key,canon(proof))}}
+class Verifier{constructor(domain,ledger){this.domain=domain;this.ledger=ledger;this.pending=new Set()}
+ challenge(){const n=b64(rnd(12));this.pending.add(n);return n}
+ async check(pres,view){const chain=view||this.ledger.chain,vc=pres.vc,p=pres.proof,items=[];
+  const add=(label,ok,detail,why)=>{items.push({label,ok,detail:ok?detail:"",why:ok?"":why});return ok};
+  const L=[["① 원장 무결성 (해시 연결 + 노드 서명 quorum)"],["② 발급자 DID 가 원장에 등록됨"],["③ 발급자 서명 (VC 전체)"],["④ 공개한 속성이 서명된 해시와 일치"],["⑤ nonce·도메인 일치 (재사용 방지)"],["⑥ 홀더 서명 (이 폰의 개인키 소유 증명)"],["⑦ 폐지(정지) 여부"]];
+  const fin=failed=>{while(items.length<7)items.push({label:L[items.length][0],ok:null});return{items,ok:!failed,failed}};
+  let [ok,why]=await this.ledger.validate(chain);if(!add(L[0][0],ok,why,why))return fin(L[0][0]);
+  const ipub=this.ledger.resolve(vc.issuer,chain);if(!add(L[1][0],!!ipub,ipub?`${vc.issuer} → 공개키 지문 ${fp(ipub)}`:"",`${vc.issuer} 미등록`))return fin(L[1][0]);
+  const body={...vc};delete body.sig;ok=await verify(ipub,canon(body),vc.sig);if(!add(L[2][0],ok,"원장의 공개키로 서명 검증 통과","원장의 공개키로 검증 실패 (다른 키로 서명됨)"))return fin(L[2][0]);
+  const badk=Object.entries(pres.reveal).filter(([k,[s,v]])=>sha(canon([s,k,v]))!==vc.digests[k]).map(x=>x[0]);const shown=Object.entries(pres.reveal).map(([k,v])=>`${k}=${v[1]}`).join(", ");
+  if(!add(L[3][0],!badk.length,"공개: "+shown,`불일치 속성 [${badk}]: 다시 계산한 해시 ≠ 서명된 해시`))return fin(L[3][0]);
+  ok=this.pending.has(p.nonce)&&p.domain===this.domain&&p.vc_hash===sha(canon(vc));
+  if(!add(L[4][0],ok,`nonce ${short(p.nonce,8)} / 도메인 ${p.domain}`,`내가(${this.domain}) 낸 nonce 가 아니거나 다른 도메인(${p.domain})용 응답`))return fin(L[4][0]);
+  ok=await verify(vc.holder_pub,canon(p),pres.holder_sig);if(!add(L[5][0],ok,"VC 에 적힌 홀더 공개키로 검증 통과","서명 불일치"))return fin(L[5][0]);
+  const rv=this.ledger.isRevoked(vc.status_id,chain);if(!add(L[6][0],!rv,`status_id ${vc.status_id.slice(0,8)}… 폐지 기록 없음`,"원장에 폐지 기록 있음"))return fin(L[6][0]);
+  this.pending.delete(p.nonce);return fin(null)}}
+/* ── 시나리오 미리 계산 ── */
+const copy=o=>JSON.parse(JSON.stringify(o));
+const CLAIMS={name:"홍길동",birth:"2003-05-17",address:"대구 북구 대학로 80",license_class:"1종 보통",adult_19:true};
+let STEPS=[],cur=0,tok=0;
+async function build(){
+ const lg=new Ledger();await lg.init();const S=[];
+ const snap=(o)=>S.push({chain:copy(lg.chain),nodes:Object.entries(lg.pubs).map(([n,p])=>[n,fp(p)]),flow:[],say:[],checks:null,verdict:null,note:"",wallet:null,issuer:null,verifier:null,extra:null,newH:null,markT:null,...o});
+ snap({id:"0",tid:"0",title:"0. 허가형 원장을 만든다 — 인가된 노드 4개, 블록은 3개 이상 서명해야 유효",say:["누구나 참여하는 비트코인과 달리, 참여 기관이 정해져 있다 (허가형, permissioned).","quorum 3 / 4  (n = 3f + 1 = 4, f = 1 : 노드 1개가 틀려도 안전)"],newH:0});
+ const police={did:"did:kr:police-demo",key:await newKey()};await lg.append([{type:"REGISTER_DID",did:police.did,pubkey:police.key.pub}]);
+ const issuerInfo={did:police.did,fp:fp(police.key.pub)};
+ snap({id:"1",tid:"1",title:"1. 발급기관(경찰청 역할)이 자기 DID 와 공개키를 원장에 등록한다",say:["원장에는 개인정보가 없다. 'did:kr:police-demo 의 공개키는 이것'이라는 사실만 기록된다."],flow:["발급기관 → 원장: REGISTER_DID (공개키만, 개인키는 발급기관 서버에 보관)"],issuer:issuerInfo,newH:1});
+ const alice={did:"did:kr:holder-alice",key:await newKey()};const {vc,salts}=await issue(police,alice.did,alice.key.pub,CLAIMS);alice.vc=vc;alice.salts=salts;alice.claims=CLAIMS;
+ const walletInfo=(w,disc)=>({did:w.did,fp:fp(w.key.pub),rows:Object.keys(w.claims).map(k=>({k,v:w.claims[k],salt:w.salts[k],h:w.vc.digests[k],shown:disc?disc.includes(k):null}))});
+ snap({id:"2",tid:"2",title:"2. 발급 — 속성마다 (salt + 값)을 해시로 묶고, 발급기관이 서명한다",say:["값 자체는 VC 에 넣지 않는다. 값은 지갑(폰)에만 있고, VC 에는 해시만 있다.","이 VC(해시 목록 + 서명)와 원본 값·salt 가 홀더 폰에 저장된다."],flow:["발급기관 → 폰: VC (속성 해시 목록 + 발급기관 서명)  — 값과 salt 는 폰에만 저장"],issuer:issuerInfo,wallet:walletInfo(alice,null),extra:{kind:"vc",vc:copy(vc)}});
+ const cvs=new Verifier("convenience-store.example",lg);
+ let n=cvs.challenge();let pres=await present(alice,n,cvs.domain,["adult_19"]);let r=await cvs.check(pres);
+ const vinfo=(v,n,recv)=>({domain:v.domain,nonce:n,recv});
+ snap({id:"3",tid:"3",title:"3. 정상 검증 — 편의점(검증자)이 '성인 여부'만 요구한다",say:["이름·생년월일·주소가 검증자에게 전달되었는가? → False","폰은 '성인 여부'와 그 salt 만 보내고, 나머지는 숨긴다."],flow:["검증자 → 폰: 챌린지 nonce "+short(n,12)+", 요청 속성 = adult_19","폰 → 검증자: adult_19 = True + salt, VC, 홀더 서명 (nonce 에 묶음)"],issuer:issuerInfo,wallet:walletInfo(alice,["adult_19"]),verifier:vinfo(cvs,n,"adult_19 = True"),checks:r.items,verdict:{ok:r.ok,failed:r.failed}});
+ // 4-A
+ const mal=await newKey();const fvc={issuer:police.did,holder:alice.did,holder_pub:alice.key.pub,digests:vc.digests,status_id:"deadbeef"};fvc.sig=await sign(mal,canon(fvc));
+ const fw={did:alice.did,key:alice.key,vc:fvc,salts,claims:CLAIMS};n=cvs.challenge();r=await cvs.check(await present(fw,n,cvs.domain,["adult_19"]));
+ snap({id:"4-A",tid:"4-A",atk:1,title:"4-A. 공격: 가짜 발급기관 — 공격자가 자기 키로 'did:kr:police-demo' 라고 적어 서명",say:["이름만 'did:kr:police-demo' 라고 써도, 검증자는 '원장에 등록된 공개키'로 확인하므로 통과할 수 없다."],flow:["공격자 공개키 지문 "+fp(mal.pub)+"  ≠  원장의 경찰 공개키 지문 "+fp(police.key.pub)],issuer:issuerInfo,wallet:walletInfo(alice,["adult_19"]),verifier:vinfo(cvs,n,"adult_19 = True (가짜 VC)"),checks:r.items,verdict:{ok:r.ok,failed:r.failed}});
+ // 4-B
+ const bob={did:"did:kr:holder-bob",key:await newKey()};const yc={...CLAIMS,birth:"2010-01-01",adult_19:false};const yi=await issue(police,bob.did,bob.key.pub,yc);bob.vc=yi.vc;bob.salts=yi.salts;bob.claims=yc;
+ n=cvs.challenge();pres=await present(bob,n,cvs.domain,["adult_19"]);pres.reveal.adult_19[1]=true;r=await cvs.check(pres);
+ snap({id:"4-B",tid:"4-B",atk:1,title:"4-B. 공격: 값 변조 — 미성년자가 adult_19 를 False → True 로 바꿔서 제출",say:["값을 바꾸면 SHA256(salt‖속성‖값)이 달라져, 발급기관이 서명한 해시와 맞지 않는다."],flow:["원래 값 adult_19 = False (발급기관이 서명한 해시는 이 값 기준)","제출 값 adult_19 = True (공격자가 조작)"],issuer:issuerInfo,wallet:{...walletInfo(bob,["adult_19"]),rows:walletInfo(bob,["adult_19"]).rows.map(x=>x.k==="adult_19"?{...x,forged:true}:x)},verifier:vinfo(cvs,n,"adult_19 = True (조작됨)"),checks:r.items,verdict:{ok:r.ok,failed:r.failed}});
+ // 4-C
+ n=cvs.challenge();const cap=await present(alice,n,cvs.domain,["adult_19"]);const bar=new Verifier("bar.example",lg);bar.pending.add(n);r=await bar.check(cap);
+ snap({id:"4-C",tid:"4-C",atk:1,title:"4-C. 공격: 재사용(replay) — 편의점에서 가로챈 응답을 술집에 그대로 제출",say:["응답이 '도메인 + 일회용 nonce'에 묶여 있어 다른 곳·다른 시간에는 쓸 수 없다.","(최악의 가정: 술집이 같은 nonce 를 썼다고 해도 도메인이 달라 실패한다)"],flow:["가로챈 응답은 도메인 '"+cvs.domain+"' 의 nonce "+short(n,8)+" 에 묶여 서명됨","술집(bar.example)이 그대로 받아 검증"],issuer:issuerInfo,wallet:walletInfo(alice,["adult_19"]),verifier:vinfo(bar,n,"가로챈 응답 재사용"),checks:r.items,verdict:{ok:r.ok,failed:r.failed}});
+ // 4-D
+ const fc=copy(lg.chain);const orig=fc[1].txs[0].pubkey;fc[1].txs[0].pubkey=mal.pub;n=cvs.challenge();r=await cvs.check(await present(alice,n,cvs.domain,["adult_19"]),fc);
+ snap({id:"4-D",tid:"4-D",atk:1,title:"4-D. 공격: 원장 위·변조 — 공격자가 발급기관 공개키를 자기 키로 바꾼 복사본 원장",say:["블록 내용이 바뀌면 해시가 달라지고, 정직한 노드 4개의 서명을 위조할 수도 없다."],flow:["블록 1 의 공개키 지문 "+fp(orig)+" → "+fp(mal.pub)+" (공격자 키로 교체)"],chain:fc,markT:1,issuer:issuerInfo,wallet:walletInfo(alice,["adult_19"]),verifier:vinfo(cvs,n,"조작된 원장을 근거로 검증"),checks:r.items,verdict:{ok:r.ok,failed:r.failed}});
+ // 4-E
+ await lg.append([{type:"REVOKE",status_id:alice.vc.status_id}]);n=cvs.challenge();r=await cvs.check(await present(alice,n,cvs.domain,["adult_19"]));
+ snap({id:"4-E",tid:"4-E",atk:1,title:"4-E. 폐지 — 면허 정지/분실 신고 후 같은 신분증으로 제출",say:["검증자는 발급기관에 전화하지 않고, 원장만 보고 폐지 여부를 안다."],flow:["발급기관 → 원장: REVOKE (status_id "+alice.vc.status_id.slice(0,8)+"…)","폰 → 검증자: 같은 신분증 다시 제출"],issuer:issuerInfo,wallet:walletInfo(alice,["adult_19"]),verifier:vinfo(cvs,n,"adult_19 = True"),checks:r.items,verdict:{ok:r.ok,failed:r.failed},newH:lg.chain.length-1});
+ // 5
+ const carol={did:"did:kr:holder-carol",key:await newKey()};const c2={name:"이영희",birth:"1999-11-02",address:"서울 강남구",license_class:"2종 보통",adult_19:true};const ci=await issue(police,carol.did,carol.key.pub,c2);carol.vc=ci.vc;carol.salts=ci.salts;carol.claims=c2;
+ const shops=[];for(const [who,attrs] of [["편의점",["adult_19"]],["렌터카",["name","license_class"]],["은행",["name","birth","address"]]]){const vf=new Verifier(who+".example",lg);const pr=await present(carol,vf.challenge(),vf.domain,attrs);const rr=await vf.check(pr);shops.push({who,attrs,hidden:Object.keys(c2).filter(k=>!attrs.includes(k)),ok:rr.ok,vals:c2})}
+ snap({id:"5",tid:"5",title:"5. 선택적 공개 — 같은 신분증으로 가게마다 필요한 속성만 보여 준다",say:["숨긴 속성의 해시는 salt(무작위 16바이트)가 있어, 날짜를 전부 대입해 봐도 값을 추측할 수 없다."],flow:["폰 → 편의점·렌터카·은행: 각자 필요한 속성만 공개"],issuer:issuerInfo,wallet:walletInfo(carol,null),extra:{kind:"shops",shops}});
+ return S}
+/* ── 화면 ── */
+const $=id=>document.getElementById(id),esc=s=>String(s).replace(/[&<>]/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;"}[c]));
+function bar(){$("bar").innerHTML=STEPS.map((s,i)=>`<button data-i="${i}" class="${s.atk?"atk":""} ${i===cur?"on":""}">${s.id}</button>`).join("")+`<span style="flex:1"></span><button id="pv">◀ 이전</button><button id="nx">다음 ▶</button><button id="rs">↺ 처음</button>`;
+ $("pv").onclick=()=>go(cur-1);$("nx").onclick=()=>go(cur+1);$("rs").onclick=()=>go(0)}
+async function go(i){if(i<0||i>=STEPS.length)return;cur=i;const my=++tok,s=STEPS[i];bar();
+ $("ttl").textContent=s.title;$("say").innerHTML=s.say.map(x=>`<div class="say">▸ ${esc(x)}</div>`).join("");$("flow").innerHTML=s.flow.map(x=>`<div class="flow"><b>⇄</b> ${esc(x)}</div>`).join("");
+ $("nodes").innerHTML=s.nodes.map(([n,f])=>`<span class="chip">${n} · 키 ${f}</span>`).join("")+`<span class="chip">quorum 3 / 4</span>`;
+ $("chain").innerHTML=s.chain.map(b=>{const t=b.txs[0];const ty=t.type==="REGISTER_DID"?`REGISTER_DID<br>${esc(t.did)}`:t.type==="REVOKE"?`REVOKE<br>status ${t.status_id.slice(0,8)}…`:t.type;
+  return `<div class="blk ${s.newH===b.height?"new":""} ${s.markT===b.height?"t":""}"><b>블록 #${b.height}</b><br><span class="ty">${ty}</span><br><span class="mono">hash ${b.hash.slice(0,10)}…<br>prev ${b.prev.slice(0,8)}…</span><br><span class="dots">${Object.keys(b.sigs).map(()=>"<i></i>").join("")}</span>${s.markT===b.height?'<div class="red">공개키 교체됨 → 해시 불일치</div>':""}</div>`}).join("");
+ $("issuer").innerHTML=s.issuer?`<div class="who">${s.issuer.did}</div><div class="mono">개인키: 발급기관 서버에만 (밖으로 안 나감)<br>공개키 지문 ${s.issuer.fp} → 원장에 등록</div>`:'<div class="dim">아직 없음</div>';
+ $("verifier").innerHTML=s.verifier?`<div class="who">${s.verifier.domain}</div><div class="mono">챌린지 nonce ${short(s.verifier.nonce,12)}<br>받은 것: ${esc(s.verifier.recv)}</div>`:'<div class="dim">아직 없음</div>';
+ $("wallet").innerHTML=s.wallet?`<div class="who">${s.wallet.did} <span class="dim mono">공개키 지문 ${s.wallet.fp}</span></div><table><tr><th>속성</th><th>값 (폰에만)</th><th>salt</th><th>VC 에 든 해시</th>${s.wallet.rows[0].shown!==null?"<th>이번 제출</th>":""}</tr>${s.wallet.rows.map(r=>`<tr><td>${r.k}</td><td>${esc(r.v)}</td><td class="mono">${short(r.salt,8)}</td><td class="mono">${short(r.h,14)}</td>${r.shown===null?"":`<td class="${r.forged?"red":r.shown?"show":"hide"}">${r.forged?"조작해서 공개 ✘":r.shown?"공개":"숨김"}</td>`}</tr>`).join("")}</table>`:'<div class="dim">VC 발급 전</div>';
+ const ck=$("checks");ck.innerHTML="";$("verdict").innerHTML="";$("note").textContent="";
+ const ex=$("extra");ex.style.display="none";
+ if(s.extra&&s.extra.kind==="vc"){ex.style.display="block";ex.innerHTML=`<h2>VC 본문 (체인에 올라가지 않음)</h2><div class="mono">issuer ${esc(s.extra.vc.issuer)}<br>holder ${esc(s.extra.vc.holder)}<br>status_id ${s.extra.vc.status_id}<br>digests: 속성별 해시 ${Object.keys(s.extra.vc.digests).length}개 (값 없음)<br>서명 ${short(s.extra.vc.sig,24)}</div>`}
+ if(s.extra&&s.extra.kind==="shops"){ex.style.display="block";ex.innerHTML=`<h2>같은 신분증, 가게마다 다른 공개 범위</h2>`+s.extra.shops.map(x=>`<div style="margin:6px 0"><b>${x.who}</b> 에게 공개: <span class="show">${x.attrs.map(k=>k+"="+esc(x.vals[k])).join(", ")}</span><br>숨김: <span class="hide">${x.hidden.join(", ")}</span> → 검증 <b class="${x.ok?"ok":"no"}">${x.ok?"수락 ✔":"거부 ✘"}</b></div>`).join("")}
+ if(!s.checks){$("note").textContent=i===0?"▶ 다음 단계로 진행하세요.":"";return}
+ ck.innerHTML=s.checks.map(c=>`<div class="chk"><b class="${c.ok===true?"ok":c.ok===false?"no":"sk"}">${c.ok===true?"✔":c.ok===false?"✘":"–"}</b><div>${esc(c.label)}${c.ok===null?' <span class="det">(앞 단계에서 실패하여 생략)</span>':""}${c.detail?`<div class="det">${esc(c.detail)}</div>`:""}${c.why?`<div class="why">← ${esc(c.why)}</div>`:""}</div></div>`).join("");
+ const rows=[...ck.children];for(const r of rows){await new Promise(z=>setTimeout(z,420));if(my!==tok)return;r.classList.add("v")}
+ await new Promise(z=>setTimeout(z,250));if(my!==tok)return;
+ $("verdict").innerHTML=`<span class="verdict v ${s.verdict.ok?"va":"vr"}">${s.verdict.ok?"⇒ 검증 결과: 수락 ✔":"⇒ 검증 결과: 거부 ✘ (실패 지점: "+esc(s.verdict.failed)+")"}</span>`}
+document.addEventListener("keydown",e=>{if(e.key===" "||e.key==="Enter"||e.key==="ArrowRight"){e.preventDefault();go(cur+1)}else if(e.key==="ArrowLeft")go(cur-1);else if(e.key.toLowerCase()==="r")go(0)});
+document.addEventListener("click",e=>{const i=e.target.dataset&&e.target.dataset.i;if(i!==undefined&&i!=="")go(+i)});
+build().then(S=>{STEPS=S;if(!REAL)$("banner").style.display="block";bar();go(0)}).catch(e=>{$("ttl").textContent="오류: "+e.message;console.error(e)});
+</script></body></html>
